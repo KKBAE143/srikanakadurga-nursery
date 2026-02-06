@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Menu, X, LogOut, Heart } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Search, User, ShoppingCart, Menu, X, LogOut, Heart, Star, ArrowRight } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { products, type Product } from "@/lib/data";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
@@ -11,7 +12,40 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
+
+  // Filter products based on search query
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase().trim();
+    return products
+      .filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query)
+      )
+      .slice(0, 5); // Limit to 5 results
+  }, [searchQuery]);
+
+  // Close search dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node) &&
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target as Node)
+      ) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -26,13 +60,19 @@ export default function Header() {
     return () => unsubscribe();
   }, [user]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setLocation(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-      setMobileMenuOpen(false);
-    }
+  const handleProductClick = (productId: string) => {
+    setSearchQuery("");
+    setSearchFocused(false);
+    setMobileMenuOpen(false);
+    setLocation(`/product/${productId}`);
+  };
+
+  const handleViewAll = () => {
+    const query = searchQuery.trim();
+    setSearchQuery("");
+    setSearchFocused(false);
+    setMobileMenuOpen(false);
+    setLocation(`/shop?search=${encodeURIComponent(query)}`);
   };
 
   const handleSignOut = async () => {
@@ -48,6 +88,76 @@ export default function Header() {
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
+
+  const SearchDropdown = ({ results, isMobile = false }: { results: Product[]; isMobile?: boolean }) => {
+    if (!searchFocused || !searchQuery.trim()) return null;
+
+    return (
+      <div
+        className={`absolute ${isMobile ? "left-0 right-0 top-full mt-2" : "left-0 right-0 top-full mt-2"} bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50`}
+        style={{ minWidth: isMobile ? "100%" : "320px" }}
+      >
+        {results.length === 0 ? (
+          <div className="p-6 text-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+              <Search className="w-5 h-5 text-gray-400" />
+            </div>
+            <p className="text-sm text-gray-500 font-medium">No plants found</p>
+            <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+          </div>
+        ) : (
+          <>
+            <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {results.length} plant{results.length !== 1 ? "s" : ""} found
+              </p>
+            </div>
+            <div className="max-h-[320px] overflow-y-auto">
+              {results.map((product) => (
+                <button
+                  key={product.id}
+                  onClick={() => handleProductClick(product.id)}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-[#f8faf7] transition-colors border-b border-gray-50 last:border-0 text-left group"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#f8faf7] to-[#EAEFE9] rounded-lg overflow-hidden flex-shrink-0">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-contain p-1 group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-[#1A1A1A] truncate group-hover:text-[#2F4836] transition-colors">
+                      {product.name}
+                    </h4>
+                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-[#2F4836]">₹{product.price}</span>
+                      {product.originalPrice && (
+                        <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
+                      )}
+                      <div className="flex items-center gap-0.5 ml-auto">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        <span className="text-xs text-gray-500">{product.rating}.0</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#2F4836] group-hover:translate-x-1 transition-all flex-shrink-0" />
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleViewAll}
+              className="w-full px-4 py-3 bg-[#2F4836] text-white text-sm font-medium hover:bg-[#243a2b] transition-colors flex items-center justify-center gap-2"
+            >
+              View all results
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#1a2e1f] to-[#2F4836] shadow-lg" data-testid="header">
@@ -88,17 +198,30 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <form onSubmit={handleSearch} className="hidden md:flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 focus-within:bg-white/20 transition-colors">
-              <Search className="w-4 h-4 text-white/60 mr-2" />
-              <input
-                type="text"
-                placeholder="Search plants..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm text-white placeholder:text-white/50 outline-none w-32 lg:w-40 font-sans"
-                data-testid="input-search"
-              />
-            </form>
+            {/* Desktop Search */}
+            <div ref={searchRef} className="hidden md:block relative">
+              <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 focus-within:bg-white/20 focus-within:border-white/40 transition-all">
+                <Search className="w-4 h-4 text-white/60 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search plants..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  className="bg-transparent text-sm text-white placeholder:text-white/50 outline-none w-32 lg:w-44 font-sans"
+                  data-testid="input-search"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="ml-1 p-0.5 text-white/50 hover:text-white transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <SearchDropdown results={searchResults} />
+            </div>
 
             {user ? (
               <>
@@ -200,17 +323,30 @@ export default function Header() {
 
         {mobileMenuOpen && (
           <div className="lg:hidden pb-4 border-t border-white/10 pt-4" data-testid="nav-mobile">
-            <form onSubmit={handleSearch} className="flex md:hidden items-center bg-white/10 rounded-full px-4 py-2.5 border border-white/20 mb-4">
-              <Search className="w-4 h-4 text-white/60 mr-2" />
-              <input
-                type="text"
-                placeholder="Search plants..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm text-white placeholder:text-white/50 outline-none w-full font-sans"
-                data-testid="input-search-mobile"
-              />
-            </form>
+            {/* Mobile Search */}
+            <div ref={mobileSearchRef} className="relative md:hidden mb-4">
+              <div className="flex items-center bg-white/10 rounded-full px-4 py-2.5 border border-white/20">
+                <Search className="w-4 h-4 text-white/60 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search plants..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  className="bg-transparent text-sm text-white placeholder:text-white/50 outline-none w-full font-sans"
+                  data-testid="input-search-mobile"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="ml-1 p-0.5 text-white/50 hover:text-white transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <SearchDropdown results={searchResults} isMobile />
+            </div>
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href} data-testid={`link-mobile-${link.label.toLowerCase()}`}>

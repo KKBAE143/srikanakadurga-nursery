@@ -8,7 +8,8 @@
       "Bash(ping:*)",
       "Bash(copy:*)",
       "Bash(cmd /c copy:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npm run build)"
     ]
   }
 }
