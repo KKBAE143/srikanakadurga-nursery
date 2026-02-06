@@ -13,6 +13,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import Profile from "@/pages/Profile";
 import Wishlist from "@/pages/Wishlist";
 import About from "@/pages/About";
+import BlogDetail from "@/pages/BlogDetail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/shop" component={Shop} />
       <Route path="/blog" component={Blog} />
+      <Route path="/blog/:id" component={BlogDetail} />
       <Route path="/cart" component={Cart} />
       <Route path="/contact" component={Contact} />
       <Route path="/login" component={Login} />
