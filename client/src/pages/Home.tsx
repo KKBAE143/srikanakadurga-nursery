@@ -1,17 +1,96 @@
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Truck, CreditCard, RotateCcw, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 import { products } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 
+const heroSlides = [
+  {
+    image: "/images/hero-leaves.webp",
+    alt: "Lush green leaves",
+    subtitle: "Shop With Us",
+    title: "Let's Make Your Home Beautiful",
+    description: "Premium plants and landscaping in Hyderabad. Transform your living spaces with nature's finest.",
+    primaryLink: "/shop",
+    primaryLabel: "Shop Now",
+    secondaryLink: "/contact",
+    secondaryLabel: "Contact Us",
+  },
+  {
+    image: "/images/hero-tropical.png",
+    alt: "Tropical indoor plants in modern home",
+    subtitle: "Bring Nature Indoors",
+    title: "Transform Your Space with Greenery",
+    description: "Discover our handpicked collection of tropical and indoor plants that purify air and elevate your decor.",
+    primaryLink: "/shop",
+    primaryLabel: "Explore Plants",
+    secondaryLink: "/about",
+    secondaryLabel: "Our Story",
+  },
+  {
+    image: "/images/hero-collection.png",
+    alt: "Curated plant collection",
+    subtitle: "Curated for You",
+    title: "Plants That Grow with You",
+    description: "From low-maintenance succulents to statement palms, find the perfect green companion for every corner.",
+    primaryLink: "/shop",
+    primaryLabel: "Browse Collection",
+    secondaryLink: "/blog",
+    secondaryLabel: "Read Blog",
+  },
+];
+
+const SLIDE_INTERVAL = 5000;
+
 export default function Home() {
   const [testimonialIdx, setTestimonialIdx] = useState(0);
+  const [heroIdx, setHeroIdx] = useState(0);
+  const [textVisible, setTextVisible] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pausedRef = useRef(false);
 
   const newArrivals = products.slice(0, 4);
   const bestSellers = products.filter(p => p.rating >= 5).slice(0, 4);
   const allForGrid = products.slice(0, 8);
+
+  const goToSlide = useCallback((idx: number) => {
+    setTextVisible(false);
+    setTimeout(() => {
+      setHeroIdx(idx);
+      setTextVisible(true);
+    }, 300);
+  }, []);
+
+  const nextSlide = useCallback(() => {
+    setTextVisible(false);
+    setTimeout(() => {
+      setHeroIdx((prev) => (prev + 1) % heroSlides.length);
+      setTextVisible(true);
+    }, 300);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setTextVisible(false);
+    setTimeout(() => {
+      setHeroIdx((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+      setTextVisible(true);
+    }, 300);
+  }, []);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      if (!pausedRef.current) {
+        setTextVisible(false);
+        setTimeout(() => {
+          setHeroIdx((prev) => (prev + 1) % heroSlides.length);
+          setTextVisible(true);
+        }, 300);
+      }
+    }, SLIDE_INTERVAL);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
 
   const testimonials = [
     { text: "Perfect! They also carry organic options & decorative items as well. Had an amazing experience and supply gardens/fresh! Such a wonderful nursery with beautiful plants and very knowledgeable staff.", name: "Anitha Reddy", location: "Hyderabad" },
@@ -19,47 +98,109 @@ export default function Home() {
     { text: "Best nursery in Hyderabad! I've been ordering from them for over a year now. The plants are always fresh and the prices are very reasonable compared to others.", name: "Lakshmi Devi", location: "Kukatpally" },
   ];
 
+  const currentSlide = heroSlides[heroIdx];
+
   return (
     <div className="min-h-screen bg-[#EAEFE9]">
       <Header />
 
-      <section className="relative w-full h-[500px] sm:h-[600px] overflow-hidden" data-testid="section-hero">
-        <img
-          src="/images/hero-leaves.webp"
-          alt="Lush green leaves"
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="eager"
-          decoding="async"
-        />
+      <section
+        className="relative w-full h-[500px] sm:h-[600px] overflow-hidden"
+        data-testid="section-hero"
+        onMouseEnter={() => { pausedRef.current = true; }}
+        onMouseLeave={() => { pausedRef.current = false; }}
+      >
+        {heroSlides.map((slide, i) => (
+          <img
+            key={slide.image}
+            src={slide.image}
+            alt={slide.alt}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+              i === heroIdx ? "opacity-100" : "opacity-0"
+            }`}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            data-testid={`img-hero-slide-${i}`}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+
         <div className="relative h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-white/80 text-sm font-heading tracking-[0.2em] uppercase mb-3" data-testid="text-hero-subtitle">
-            Shop With Us
+          <p
+            className={`text-white/80 text-sm font-heading tracking-[0.2em] uppercase mb-3 transition-all duration-300 ${
+              textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+            }`}
+            data-testid="text-hero-subtitle"
+          >
+            {currentSlide.subtitle}
           </p>
           <h1
-            className="font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight max-w-xl uppercase tracking-wide"
+            className={`font-heading text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight max-w-xl uppercase tracking-wide transition-all duration-300 delay-75 ${
+              textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
             data-testid="text-hero-title"
           >
-            Let's Make Your Home Beautiful
+            {currentSlide.title}
           </h1>
-          <p className="text-white/80 text-sm sm:text-base mt-4 max-w-md font-sans">
-            Premium plants and landscaping in Hyderabad. Transform your living spaces with nature's finest.
+          <p
+            className={`text-white/80 text-sm sm:text-base mt-4 max-w-md font-sans transition-all duration-300 delay-150 ${
+              textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+            }`}
+          >
+            {currentSlide.description}
           </p>
-          <div className="flex gap-3 mt-6">
-            <Link href="/shop">
+          <div
+            className={`flex gap-3 mt-6 transition-all duration-300 delay-200 ${
+              textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+            }`}
+          >
+            <Link href={currentSlide.primaryLink}>
               <button
                 className="bg-[#2F4836] text-white px-8 py-3 rounded-full font-heading text-sm tracking-wider uppercase hover:bg-[#3a5a44] transition-colors"
-                data-testid="button-shop-now-hero"
+                data-testid="button-hero-primary"
               >
-                Shop Now
+                {currentSlide.primaryLabel}
               </button>
             </Link>
-            <Link href="/contact">
-              <button className="border border-white/40 text-white px-8 py-3 rounded-full font-heading text-sm tracking-wider uppercase hover:bg-white/10 transition-colors backdrop-blur-sm" data-testid="button-contact-hero">
-                Contact Us
+            <Link href={currentSlide.secondaryLink}>
+              <button
+                className="border border-white/40 text-white px-8 py-3 rounded-full font-heading text-sm tracking-wider uppercase hover:bg-white/10 transition-colors backdrop-blur-sm"
+                data-testid="button-hero-secondary"
+              >
+                {currentSlide.secondaryLabel}
               </button>
             </Link>
           </div>
+        </div>
+
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white/80 hover:bg-black/40 hover:text-white transition-colors backdrop-blur-sm"
+          data-testid="button-hero-prev"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white/80 hover:bg-black/40 hover:text-white transition-colors backdrop-blur-sm"
+          data-testid="button-hero-next"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToSlide(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === heroIdx
+                  ? "w-8 h-2 bg-white"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/70"
+              }`}
+              data-testid={`button-hero-dot-${i}`}
+            />
+          ))}
         </div>
       </section>
 
