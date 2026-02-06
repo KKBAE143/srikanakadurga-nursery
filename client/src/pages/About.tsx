@@ -421,8 +421,8 @@ export default function About() {
       </section>
 
       {/* Image Gallery Strip */}
-      <section className="py-4" data-testid="section-image-strip">
-        <div className="flex gap-4 px-4 overflow-hidden">
+      <section className="py-4 overflow-hidden" data-testid="section-image-strip">
+        <div className="flex gap-4 px-4 overflow-hidden max-w-full">
           {[
             {
               src: "/images/nursery-5.jpeg",
@@ -443,7 +443,7 @@ export default function About() {
           ].map((photo, i) => (
             <div
               key={i}
-              className="flex-1 min-w-[200px] h-64 rounded-2xl overflow-hidden"
+              className="flex-1 min-w-0 h-64 rounded-2xl overflow-hidden"
               data-testid={`img-strip-${i}`}
             >
               <img

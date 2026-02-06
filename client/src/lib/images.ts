@@ -145,8 +145,8 @@ export const Images = {
   },
 };
 
-// Helper to get full ImageKit URL for an image path
-export function getImageUrl(imagePath: string): string {
+// Helper to get full ImageKit URL for an image path with default optimizations
+export function getImageUrl(imagePath: string, applyOptimization = true): string {
   // If already an ImageKit URL, return as-is
   if (imagePath.startsWith("https://ik.imagekit.io")) {
     return imagePath;
@@ -155,6 +155,10 @@ export function getImageUrl(imagePath: string): string {
   // If it's a local path like /images/xxx.webp, convert to ImageKit path
   if (imagePath.startsWith("/images/")) {
     const filename = imagePath.replace("/images/", "");
+    // Apply default optimization: auto format, quality 80
+    if (applyOptimization) {
+      return `${IMAGEKIT_BASE}/tr:f-auto,q-80/${filename}`;
+    }
     return `${IMAGEKIT_BASE}/${filename}`;
   }
 
