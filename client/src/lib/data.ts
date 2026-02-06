@@ -1,5 +1,6 @@
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "./firebase";
+import { getImageUrl } from "./images";
 
 export interface Product {
   id: string;

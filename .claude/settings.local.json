@@ -16,7 +16,18 @@
       "Bash(npm uninstall:*)",
       "Bash(node:*)",
       "WebFetch(domain:dribbble.com)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(where:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(winget install:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo view KKBAE143/srikanakadurga-nursery --json url,description,visibility)"
     ]
   }
 }
