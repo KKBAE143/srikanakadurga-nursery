@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Truck, CreditCard, RotateCcw, Phone, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -48,49 +49,42 @@ export default function Home() {
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [heroIdx, setHeroIdx] = useState(0);
   const [textVisible, setTextVisible] = useState(true);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pausedRef = useRef(false);
+  const [paused, setPaused] = useState(false);
+  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const newArrivals = products.slice(0, 4);
   const bestSellers = products.filter(p => p.rating >= 5).slice(0, 4);
   const allForGrid = products.slice(0, 8);
 
-  const goToSlide = useCallback((idx: number) => {
-    setTextVisible(false);
-    setTimeout(() => {
-      setHeroIdx(idx);
-      setTextVisible(true);
-    }, 300);
+  const clearTimers = useCallback(() => {
+    if (autoTimerRef.current) { clearTimeout(autoTimerRef.current); autoTimerRef.current = null; }
+    if (fadeTimerRef.current) { clearTimeout(fadeTimerRef.current); fadeTimerRef.current = null; }
   }, []);
 
-  const nextSlide = useCallback(() => {
+  const changeSlide = useCallback((getNext: (prev: number) => number) => {
+    clearTimers();
     setTextVisible(false);
-    setTimeout(() => {
-      setHeroIdx((prev) => (prev + 1) % heroSlides.length);
+    fadeTimerRef.current = setTimeout(() => {
+      setHeroIdx(getNext);
       setTextVisible(true);
     }, 300);
-  }, []);
+  }, [clearTimers]);
 
-  const prevSlide = useCallback(() => {
-    setTextVisible(false);
-    setTimeout(() => {
-      setHeroIdx((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-      setTextVisible(true);
-    }, 300);
-  }, []);
+  const goToSlide = useCallback((idx: number) => changeSlide(() => idx), [changeSlide]);
+  const nextSlide = useCallback(() => changeSlide((prev) => (prev + 1) % heroSlides.length), [changeSlide]);
+  const prevSlide = useCallback(() => changeSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length), [changeSlide]);
 
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      if (!pausedRef.current) {
-        setTextVisible(false);
-        setTimeout(() => {
-          setHeroIdx((prev) => (prev + 1) % heroSlides.length);
-          setTextVisible(true);
-        }, 300);
-      }
+    if (paused) {
+      if (autoTimerRef.current) { clearTimeout(autoTimerRef.current); autoTimerRef.current = null; }
+      return;
+    }
+    autoTimerRef.current = setTimeout(() => {
+      changeSlide((prev) => (prev + 1) % heroSlides.length);
     }, SLIDE_INTERVAL);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
+    return () => { clearTimers(); };
+  }, [heroIdx, paused, changeSlide, clearTimers]);
 
   const testimonials = [
     { text: "Perfect! They also carry organic options & decorative items as well. Had an amazing experience and supply gardens/fresh! Such a wonderful nursery with beautiful plants and very knowledgeable staff.", name: "Anitha Reddy", location: "Hyderabad" },
@@ -107,8 +101,8 @@ export default function Home() {
       <section
         className="relative w-full h-[500px] sm:h-[600px] overflow-hidden"
         data-testid="section-hero"
-        onMouseEnter={() => { pausedRef.current = true; }}
-        onMouseLeave={() => { pausedRef.current = false; }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
       >
         {heroSlides.map((slide, i) => (
           <img
@@ -173,20 +167,24 @@ export default function Home() {
           </div>
         </div>
 
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white/80 hover:bg-black/40 hover:text-white transition-colors backdrop-blur-sm"
+          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/20 text-white/80 backdrop-blur-sm"
           data-testid="button-hero-prev"
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 text-white/80 hover:bg-black/40 hover:text-white transition-colors backdrop-blur-sm"
+          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/20 text-white/80 backdrop-blur-sm"
           data-testid="button-hero-next"
         >
           <ChevronRight className="w-5 h-5" />
-        </button>
+        </Button>
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
           {heroSlides.map((_, i) => (
