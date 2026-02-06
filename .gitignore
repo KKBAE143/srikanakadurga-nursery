@@ -4,3 +4,12 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment files (keep secrets out of git)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Vercel
+.vercel
