@@ -4,9 +4,6 @@ import MemoryStore from "memorystore";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
-import { db } from "./db";
-import { sql } from "drizzle-orm";
-import { seedDatabase } from "./seed";
 
 const app = express();
 const httpServer = createServer(app);
@@ -77,46 +74,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      name TEXT NOT NULL,
-      price INTEGER NOT NULL,
-      image TEXT NOT NULL,
-      category TEXT NOT NULL,
-      rating INTEGER NOT NULL DEFAULT 5,
-      description TEXT,
-      in_stock BOOLEAN NOT NULL DEFAULT true
-    )
-  `);
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS cart_items (
-      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      product_id INTEGER NOT NULL,
-      quantity INTEGER NOT NULL DEFAULT 1,
-      session_id TEXT NOT NULL
-    )
-  `);
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS blog_posts (
-      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      title TEXT NOT NULL,
-      excerpt TEXT NOT NULL,
-      image TEXT NOT NULL,
-      content TEXT
-    )
-  `);
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS contact_messages (
-      id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      full_name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      message TEXT NOT NULL
-    )
-  `);
-
-  await seedDatabase();
-
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
@@ -140,14 +97,7 @@ app.use((req, res, next) => {
   }
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+  httpServer.listen(port, () => {
+    log(`serving on http://localhost:${port}`);
+  });
 })();
