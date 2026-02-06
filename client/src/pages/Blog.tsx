@@ -1,14 +1,48 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { blogPosts } from "@/lib/data";
+import { blogPosts as staticBlogs, fetchBlogPosts, type BlogPost } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
-import { Calendar, User, ArrowRight } from "lucide-react";
+import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 
 export default function Blog() {
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(staticBlogs);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const posts = await fetchBlogPosts();
+        setAllPosts(posts);
+      } catch (error) {
+        console.error("Error loading blog posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPosts();
+  }, []);
+
   // Feature the first post
-  const featuredPost = blogPosts[0];
-  const otherPosts = blogPosts.slice(1);
+  const featuredPost = allPosts[0];
+  const otherPosts = allPosts.slice(1);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f8faf7]">
+        <Header />
+        <PageHero
+          image="/images/blog-hero.webp"
+          title="Glorify the Nature around You"
+        />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 text-[#2F4836] animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8faf7]">
@@ -151,7 +185,7 @@ export default function Blog() {
         </div>
 
         {/* Empty State */}
-        {blogPosts.length === 0 && (
+        {allPosts.length === 0 && (
           <div className="text-center py-20">
             <div className="w-20 h-20 mx-auto mb-6 bg-[#EAEFE9] rounded-full flex items-center justify-center">
               <Calendar className="w-10 h-10 text-[#8F9E8B]" />

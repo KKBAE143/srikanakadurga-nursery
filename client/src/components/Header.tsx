@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Menu, X, LogOut, Heart, Star, ArrowRight } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, LogOut, Heart, Star, ArrowRight, Settings } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -16,7 +16,7 @@ export default function Header() {
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
 
   // Filter products based on search query
   const searchResults = useMemo(() => {
@@ -297,6 +297,24 @@ export default function Header() {
 
                       {/* Menu Items */}
                       <div className="p-2">
+                        {isAdmin && (
+                          <Link href="/admin">
+                            <span
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#1A1A1A] hover:bg-[#f8faf7] cursor-pointer transition-colors"
+                              data-testid="link-admin"
+                            >
+                              <div className="w-8 h-8 bg-[#2F4836] rounded-lg flex items-center justify-center">
+                                <Settings className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="font-medium">Admin Panel</p>
+                                <p className="text-xs text-[#8F9E8B]">Manage your store</p>
+                              </div>
+                            </span>
+                          </Link>
+                        )}
+
                         <Link href="/profile">
                           <span
                             onClick={() => setUserMenuOpen(false)}

@@ -3,12 +3,28 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Truck, CreditCard, RotateCcw, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 
-const heroSlides = [
+interface HeroSlide {
+  id: string;
+  image: string;
+  alt?: string;
+  subtitle: string;
+  title: string;
+  description: string;
+  primaryLink: string;
+  primaryLabel: string;
+  secondaryLink?: string;
+  secondaryLabel?: string;
+}
+
+const defaultHeroSlides: HeroSlide[] = [
   {
+    id: "1",
     image: "/images/hero-leaves.webp",
     alt: "Lush green leaves",
     subtitle: "Shop With Us",
@@ -20,6 +36,7 @@ const heroSlides = [
     secondaryLabel: "Contact Us",
   },
   {
+    id: "2",
     image: "/images/hero-tropical.png",
     alt: "Tropical indoor plants in modern home",
     subtitle: "Bring Nature Indoors",
@@ -31,6 +48,7 @@ const heroSlides = [
     secondaryLabel: "Our Story",
   },
   {
+    id: "3",
     image: "/images/hero-collection.png",
     alt: "Curated plant collection",
     subtitle: "Curated for You",
@@ -50,8 +68,28 @@ export default function Home() {
   const [heroIdx, setHeroIdx] = useState(0);
   const [textVisible, setTextVisible] = useState(true);
   const [paused, setPaused] = useState(false);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(defaultHeroSlides);
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch hero slides from Firestore
+  useEffect(() => {
+    const fetchHeroSlides = async () => {
+      try {
+        const docRef = doc(db, "settings", "homepage");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.heroSlides && data.heroSlides.length > 0) {
+            setHeroSlides(data.heroSlides);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching hero slides:", error);
+      }
+    };
+    fetchHeroSlides();
+  }, []);
 
   const newArrivals = products.slice(0, 4);
   const bestSellers = products.filter(p => p.rating >= 5).slice(0, 4);

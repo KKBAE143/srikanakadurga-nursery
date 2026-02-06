@@ -1,3 +1,6 @@
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import { db } from "./firebase";
+
 export interface Product {
   id: string;
   name: string;
@@ -12,6 +15,8 @@ export interface Product {
   waterFrequency?: string;
   petFriendly?: boolean;
   inStock: boolean;
+  featured?: boolean;
+  slug?: string;
 }
 
 export interface BlogPost {
@@ -22,8 +27,12 @@ export interface BlogPost {
   content: string;
   author?: string;
   date?: string;
+  status?: "draft" | "published";
+  featured?: boolean;
+  slug?: string;
 }
 
+// Static data for fallback
 export const products: Product[] = [
   {
     id: "areca-palm",
@@ -199,13 +208,10 @@ Studies show that having plants indoors can reduce stress by up to 37%, improve 
 - Wipe leaves with a damp cloth monthly to keep them dust-free and breathing well
 - Don't overwater! More indoor plants die from overwatering than underwatering
 
-**Where to Place Your Plants**
-
-Think about the light each room gets. North-facing windows in Hyderabad get gentle, indirect light - perfect for ferns and peace lilies. South and west-facing spots get strong afternoon sun, ideal for succulents and cacti. East-facing windows provide the best morning light for most flowering plants.
-
 Visit Srikanakadurga Nursery in Ramanthapur to handpick the perfect indoor plants for your home. Our team will help you choose varieties that match your space and lifestyle.`,
     author: "Priya Sharma",
     date: "2026-01-15",
+    status: "published",
   },
   {
     id: "rare-plants",
@@ -230,20 +236,10 @@ Closer to home, Telangana has its own stories of plant conservation. The state f
 
 At Srikanakadurga Nursery, we play our small part by cultivating and distributing native species that are becoming hard to find. We believe every plant lover can be a conservationist.
 
-**How You Can Help**
-
-- Choose native plants for your garden - they support local pollinators and wildlife
-- Avoid buying plants collected from the wild - always buy nursery-propagated specimens
-- Share seeds and cuttings with fellow gardeners to spread plant diversity
-- Support local nurseries that practise sustainable growing methods
-
-**Starting Your Rare Plant Collection**
-
-If you're interested in growing something unique, start with hardy rare varieties like the ZZ plant, String of Pearls, or Monstera deliciosa. These are readily available at our nursery and make excellent conversation starters.
-
 The world of rare plants is endlessly fascinating. Every leaf tells a story, and every bloom is a small miracle worth celebrating.`,
     author: "Dr. Ravi Kumar",
     date: "2026-01-20",
+    status: "published",
   },
   {
     id: "plant-styling",
@@ -260,33 +256,15 @@ The secret to great plant styling is thinking in layers. Place tall plants like 
 
 Your planter is just as important as the plant itself. Here are some ideas that work beautifully in Indian homes:
 
-- **Terracotta pots** - Timeless and breathable, they suit traditional and contemporary interiors alike. The earthy tones complement the sage and green palette of most plants.
-- **Brass and copper urlis** - A truly Indian touch. Float flowers in a brass urli for a pooja room, or use a copper vessel for money plants.
+- **Terracotta pots** - Timeless and breathable, they suit traditional and contemporary interiors alike.
+- **Brass and copper urlis** - A truly Indian touch. Float flowers in a brass urli for a pooja room.
 - **Woven baskets** - Jute and cane baskets add warmth and texture. Perfect for boho-style living rooms.
 - **Ceramic pots** - Clean lines and modern colours work well in minimalist spaces.
-
-**Room-by-Room Styling Guide**
-
-**Living Room:** Create a focal point with a large statement plant like a Monstera or Bird of Paradise. Group smaller plants in odd numbers (3 or 5) on a plant stand for visual interest.
-
-**Bedroom:** Choose calming plants like lavender, jasmine, or snake plants. These promote better sleep and add a serene atmosphere.
-
-**Kitchen:** Grow herbs like tulsi, mint, and curry leaves on your kitchen windowsill. They're practical, fragrant, and add a lovely green touch.
-
-**Balcony:** If you have a Hyderabad balcony that gets direct sun, go for bougainvillea, hibiscus, or jasmine creepers. For shaded balconies, ferns and peace lilies work wonderfully.
-
-**Bathroom:** Pothos, ferns, and air plants love the humidity. Hang them near windows for a spa-like feel.
-
-**Styling Tips from Our Team**
-
-- Mix different leaf shapes and textures for visual interest
-- Use plants of varying heights to create depth
-- Don't be afraid of empty space - let each plant breathe
-- Group plants with similar care needs together for easier maintenance
 
 Visit us at Srikanakadurga Nursery for personalised styling advice. Bring photos of your space and our team will help you pick the perfect plants and planters.`,
     author: "Meera Reddy",
     date: "2026-01-25",
+    status: "published",
   },
   {
     id: "plants-wellbeing",
@@ -297,44 +275,113 @@ Visit us at Srikanakadurga Nursery for personalised styling advice. Bring photos
 
 **The Science Behind Plant Therapy**
 
-A landmark study by NASA found that indoor plants can remove up to 87% of air toxins in just 24 hours. Plants like spider plants, peace lilies, and snake plants are particularly effective at filtering harmful chemicals like formaldehyde, benzene, and trichloroethylene from indoor air.
+A landmark study by NASA found that indoor plants can remove up to 87% of air toxins in just 24 hours. Plants like spider plants, peace lilies, and snake plants are particularly effective at filtering harmful chemicals from indoor air.
 
 But the benefits go far beyond air quality:
 
-- **Reduced stress:** A study published in the Journal of Physiological Anthropology found that interacting with plants can reduce both physiological and psychological stress.
-- **Better focus:** Research from the University of Michigan showed that spending time near plants can improve memory and attention by up to 20%.
-- **Faster healing:** Hospital patients with plants in their rooms recovered faster and needed fewer painkillers than those without, according to a study in HortScience.
+- **Reduced stress:** Interacting with plants can reduce both physiological and psychological stress.
+- **Better focus:** Spending time near plants can improve memory and attention by up to 20%.
+- **Faster healing:** Hospital patients with plants in their rooms recovered faster.
 
 **Plants in Indian Wellness Traditions**
 
 India has known about the healing power of plants for thousands of years. Ayurveda, our ancient system of medicine, is built on the wisdom of plant-based healing.
 
-- **Tulsi (Holy Basil)** - Revered in every Indian household, tulsi purifies the air and is used to treat colds, coughs, and digestive issues.
-- **Aloe Vera** - Known as "kumari" in Ayurveda, it heals skin, aids digestion, and boosts immunity.
-- **Neem** - The "village pharmacy" of India, neem has antibacterial, antifungal, and anti-inflammatory properties.
-- **Jasmine** - Its fragrance is proven to reduce anxiety and improve sleep quality. A staple in South Indian homes and temples.
-
-**Creating a Healing Garden at Home**
-
-You don't need a large garden to experience the therapeutic benefits of plants. Even a small collection on your balcony or windowsill can make a meaningful difference.
-
-Start with these five plants for a wellness corner:
-1. Tulsi - for respiratory health and spiritual well-being
-2. Aloe Vera - for skin care and first aid
-3. Lavender - for stress relief and better sleep
-4. Mint - for digestion and fresh breath
-5. Snake Plant - for clean air, especially in bedrooms
-
-**Plant Care as Self-Care**
-
-The act of caring for plants is itself therapeutic. The routine of watering, pruning, and repotting creates a mindful practice that grounds us in the present moment. Many of our customers at Srikanakadurga Nursery tell us that their morning plant care routine has become their favourite part of the day.
+- **Tulsi (Holy Basil)** - Purifies the air and treats colds, coughs, and digestive issues.
+- **Aloe Vera** - Heals skin, aids digestion, and boosts immunity.
+- **Neem** - Has antibacterial, antifungal, and anti-inflammatory properties.
+- **Jasmine** - Its fragrance reduces anxiety and improves sleep quality.
 
 Whether you're looking to improve your air quality, reduce stress, or simply bring more beauty into your life, plants are the answer. Visit us in Ramanthapur to start your green wellness journey.`,
     author: "Dr. Anita Rao",
     date: "2026-02-01",
+    status: "published",
   },
 ];
 
+// Cache for Firestore data
+let cachedProducts: Product[] | null = null;
+let cachedBlogs: BlogPost[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Fetch products from Firestore with static fallback
+export async function fetchProducts(): Promise<Product[]> {
+  const now = Date.now();
+  if (cachedProducts && now - lastFetchTime < CACHE_DURATION) {
+    return cachedProducts;
+  }
+
+  try {
+    const snapshot = await getDocs(collection(db, "products"));
+    if (snapshot.size > 0) {
+      cachedProducts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Product[];
+      lastFetchTime = now;
+      return cachedProducts;
+    }
+  } catch (error) {
+    console.error("Error fetching products from Firestore:", error);
+  }
+
+  // Fallback to static data
+  return products;
+}
+
+// Fetch blogs from Firestore with static fallback
+export async function fetchBlogPosts(): Promise<BlogPost[]> {
+  const now = Date.now();
+  if (cachedBlogs && now - lastFetchTime < CACHE_DURATION) {
+    return cachedBlogs;
+  }
+
+  try {
+    const snapshot = await getDocs(collection(db, "blogPosts"));
+    if (snapshot.size > 0) {
+      cachedBlogs = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter((blog: any) => blog.status === "published") as BlogPost[];
+      lastFetchTime = now;
+      return cachedBlogs;
+    }
+  } catch (error) {
+    console.error("Error fetching blog posts from Firestore:", error);
+  }
+
+  // Fallback to static data
+  return blogPosts;
+}
+
+// Get single product by ID
+export async function fetchProductById(id: string): Promise<Product | undefined> {
+  const allProducts = await fetchProducts();
+  return allProducts.find((p) => p.id === id);
+}
+
+// Get single blog by ID
+export async function fetchBlogPostById(id: string): Promise<BlogPost | undefined> {
+  const allBlogs = await fetchBlogPosts();
+  return allBlogs.find((b) => b.id === id);
+}
+
+// Get products by category
+export async function fetchProductsByCategory(category: string): Promise<Product[]> {
+  const allProducts = await fetchProducts();
+  return allProducts.filter((p) => p.category === category);
+}
+
+// Get all categories
+export async function fetchCategories(): Promise<string[]> {
+  const allProducts = await fetchProducts();
+  return Array.from(new Set(allProducts.map((p) => p.category)));
+}
+
+// Synchronous helpers for backwards compatibility
 export function getBlogPostById(id: string): BlogPost | undefined {
   return blogPosts.find((p) => p.id === id);
 }
@@ -349,4 +396,49 @@ export function getProductsByCategory(category: string): Product[] {
 
 export function getCategories(): string[] {
   return Array.from(new Set(products.map((p) => p.category)));
+}
+
+// Migration function to seed Firestore with static data
+export async function migrateDataToFirestore(): Promise<{ products: number; blogs: number }> {
+  let productsCount = 0;
+  let blogsCount = 0;
+
+  // Migrate products
+  for (const product of products) {
+    try {
+      await setDoc(doc(db, "products", product.id), {
+        ...product,
+        slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+        featured: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      productsCount++;
+    } catch (error) {
+      console.error(`Error migrating product ${product.id}:`, error);
+    }
+  }
+
+  // Migrate blog posts
+  for (const blog of blogPosts) {
+    try {
+      await setDoc(doc(db, "blogPosts", blog.id), {
+        ...blog,
+        slug: blog.title.toLowerCase().replace(/\s+/g, "-"),
+        status: "published",
+        featured: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      blogsCount++;
+    } catch (error) {
+      console.error(`Error migrating blog ${blog.id}:`, error);
+    }
+  }
+
+  // Clear cache to force refresh
+  cachedProducts = null;
+  cachedBlogs = null;
+
+  return { products: productsCount, blogs: blogsCount };
 }

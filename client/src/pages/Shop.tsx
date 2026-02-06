@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { products, getCategories, type Product } from "@/lib/data";
+import { products as staticProducts, fetchProducts, fetchCategories, type Product } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
@@ -15,6 +15,7 @@ import {
   Search,
   Grid3X3,
   LayoutGrid,
+  Loader2,
 } from "lucide-react";
 
 const PRODUCTS_PER_PAGE = 12;
@@ -27,6 +28,28 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [gridCols, setGridCols] = useState<3 | 4>(4);
+  const [allProducts, setAllProducts] = useState<Product[]>(staticProducts);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products from Firestore
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [products, cats] = await Promise.all([
+          fetchProducts(),
+          fetchCategories(),
+        ]);
+        setAllProducts(products);
+        setCategories(cats);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
@@ -48,7 +71,7 @@ export default function Shop() {
     setCurrentPage(1);
   };
 
-  let filteredProducts: Product[] = [...products];
+  let filteredProducts: Product[] = [...allProducts];
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
@@ -86,7 +109,6 @@ export default function Shop() {
     currentPage * PRODUCTS_PER_PAGE
   );
 
-  const categories = getCategories();
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedSort !== "";
 
@@ -177,7 +199,7 @@ export default function Shop() {
                 {cat}
               </span>
               <span className="ml-auto text-xs text-[#8F9E8B] bg-[#f0f4ef] px-2 py-0.5 rounded-full">
-                {products.filter((p) => p.category === cat).length}
+                {allProducts.filter((p) => p.category === cat).length}
               </span>
             </label>
           ))}
