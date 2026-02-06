@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Leaf, Menu, X, LogOut, Heart } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, LogOut, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -54,8 +54,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           <Link href="/" data-testid="link-logo">
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <Leaf className="w-5 h-5 text-[#2F4836]" />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <img src="/logo.png" alt="Srikanakadurganursery" className="w-10 h-10 object-contain" />
               <span className="font-heading font-semibold text-[#2F4836] text-sm sm:text-base tracking-wide">
                 Srikanakadurganursery
               </span>

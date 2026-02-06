@@ -5,7 +5,10 @@
       "Bash(npm run check:*)",
       "Bash(npm run dev)",
       "Bash(timeout:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(copy:*)",
+      "Bash(cmd /c copy:*)",
+      "Bash(powershell:*)"
     ]
   }
 }
