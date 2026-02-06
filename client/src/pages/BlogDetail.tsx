@@ -1,55 +1,94 @@
+import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
-import { ArrowLeft, Calendar, User, Clock, Facebook, Twitter, Linkedin, ArrowRight, Play, ShoppingCart, Star, Leaf, BookOpen, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, User, Clock, Facebook, Twitter, Linkedin, ArrowRight, Leaf, BookOpen, TrendingUp, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getBlogPostById, blogPosts, products, Product } from "@/lib/data";
+import BlockRenderer from "@/components/BlockRenderer";
+import TemplateRenderer from "@/components/TemplateRenderer";
+import { getBlogPostById, blogPosts, products, Product, fetchBlogPosts, type BlogPost } from "@/lib/data";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { ContentBlock } from "@/admin/components/blocks/types";
+import { Star, ShoppingCart } from "lucide-react";
 
-function estimateReadTime(content: string): number {
+interface BlogTemplate {
+  introduction: string;
+  section1Title: string;
+  section1Content: string;
+  section1Type: "paragraph" | "numbered" | "bullets";
+  galleryImages: Array<{ url: string; alt: string }>;
+  section2Title: string;
+  section2Content: string;
+  section2Type: "paragraph" | "numbered" | "bullets";
+  videoUrl: string;
+  videoTitle: string;
+  section3Title: string;
+  section3Content: string;
+  section3Type: "paragraph" | "numbered" | "bullets";
+  keyPointsTitle: string;
+  keyPoints: string[];
+  featuredProductIds: string[];
+  conclusion: string;
+}
+
+interface FirestoreBlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image?: string;
+  featuredImage?: string;
+  content?: string;
+  blocks?: ContentBlock[];
+  template?: BlogTemplate;
+  author?: string;
+  date?: string;
+  status?: string;
+}
+
+function estimateReadTime(content: string | ContentBlock[]): number {
+  if (Array.isArray(content)) {
+    // Estimate from blocks
+    let words = 0;
+    content.forEach((block) => {
+      if (block.type === "text") {
+        words += block.content.split(/\s+/).length;
+      } else if (block.type === "heading") {
+        words += block.text.split(/\s+/).length;
+      } else if (block.type === "quote") {
+        words += block.text.split(/\s+/).length;
+      } else if (block.type === "keypoints") {
+        block.points.forEach((p) => {
+          words += p.title.split(/\s+/).length;
+          if (p.description) words += p.description.split(/\s+/).length;
+        });
+      }
+    });
+    return Math.max(1, Math.ceil(words / 200));
+  }
   const words = content.split(/\s+/).length;
   return Math.max(1, Math.ceil(words / 200));
 }
 
-// Embedded media content for blogs
+// Legacy embedded media content for old blogs
 const blogMedia: Record<string, { images: string[]; videos: string[]; relatedProducts: string[] }> = {
   "indoor-plants-guide": {
-    images: [
-      "/images/plant-snake-plant.webp",
-      "/images/plant-areca-palm.webp",
-      "/images/plant-peace-lily.webp",
-    ],
-    videos: [
-      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder - will be replaced with custom video
-    ],
+    images: ["/images/plant-snake-plant.webp", "/images/plant-areca-palm.webp", "/images/plant-peace-lily.webp"],
+    videos: ["https://www.youtube.com/embed/dQw4w9WgXcQ"],
     relatedProducts: ["snake-plant", "areca-palm", "money-plant", "peace-lily", "spider-plant"],
   },
   "rare-plants": {
-    images: [
-      "/images/plant-zz-plant.webp",
-      "/images/plant-jade.webp",
-    ],
-    videos: [
-      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder - will be replaced with custom video
-    ],
+    images: ["/images/plant-zz-plant.webp", "/images/plant-jade.webp"],
+    videos: ["https://www.youtube.com/embed/dQw4w9WgXcQ"],
     relatedProducts: ["zz-plant", "jade-plant", "rubber-plant"],
   },
   "plant-styling": {
-    images: [
-      "/images/plant-rubber-plant.webp",
-      "/images/plant-money-plant.webp",
-    ],
-    videos: [
-      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder - will be replaced with custom video
-    ],
+    images: ["/images/plant-rubber-plant.webp", "/images/plant-money-plant.webp"],
+    videos: ["https://www.youtube.com/embed/dQw4w9WgXcQ"],
     relatedProducts: ["rubber-plant", "areca-palm", "money-plant", "snake-plant"],
   },
   "plants-wellbeing": {
-    images: [
-      "/images/plant-tulsi.webp",
-      "/images/plant-aloe-vera.webp",
-    ],
-    videos: [
-      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder - will be replaced with custom video
-    ],
+    images: ["/images/plant-tulsi.webp", "/images/plant-aloe-vera.webp"],
+    videos: ["https://www.youtube.com/embed/dQw4w9WgXcQ"],
     relatedProducts: ["tulsi", "aloe-vera", "snake-plant", "peace-lily", "spider-plant"],
   },
 };
@@ -96,20 +135,20 @@ function ProductCard({ product }: { product: Product }) {
 
 function SidebarProductSlider({ productIds }: { productIds: string[] }) {
   const sidebarProducts = productIds
-    .map(id => products.find(p => p.id === id))
+    .map((id) => products.find((p) => p.id === id))
     .filter((p): p is Product => p !== undefined)
     .slice(0, 3);
 
   return (
     <div className="flex flex-col gap-5">
-      {sidebarProducts.map(product => (
+      {sidebarProducts.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );
 }
 
-function renderContent(content: string, postId: string) {
+function renderLegacyContent(content: string, postId: string) {
   const lines = content.split("\n");
   const elements: JSX.Element[] = [];
   const media = blogMedia[postId] || { images: [], videos: [], relatedProducts: [] };
@@ -121,24 +160,15 @@ function renderContent(content: string, postId: string) {
     const trimmed = line.trim();
     if (!trimmed) return;
 
-    // Insert media after certain sections
-    const insertImageAfter = sectionCount === 1 && media.images[0];
-    const insertVideoAfter = sectionCount === 2 && media.videos[0];
-    const insertProductsAfter = sectionCount === 3 && media.relatedProducts.length > 0;
-
     if (trimmed.startsWith("**") && trimmed.endsWith("**") && !trimmed.includes("- ") && !trimmed.includes(". ")) {
       sectionCount++;
 
       elements.push(
-        <h2
-          key={i}
-          className="font-heading text-2xl sm:text-3xl font-bold text-[#1A1A1A] mt-12 mb-6 tracking-wide"
-        >
+        <h2 key={i} className="font-heading text-2xl sm:text-3xl font-bold text-[#1A1A1A] mt-12 mb-6 tracking-wide">
           {trimmed.replace(/\*\*/g, "")}
         </h2>
       );
 
-      // Insert image gallery after first section
       if (sectionCount === 2 && media.images.length > 0) {
         elements.push(
           <div key={`gallery-${i}`} className="my-10 grid grid-cols-2 gap-4">
@@ -150,63 +180,6 @@ function renderContent(content: string, postId: string) {
           </div>
         );
       }
-
-      // Insert video placeholder after second section
-      if (sectionCount === 3 && media.images.length > 0) {
-        elements.push(
-          <div key={`video-${i}`} className="my-10">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-video bg-gradient-to-br from-[#2F4836] to-[#4a6b52]">
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 cursor-pointer hover:bg-white/30 transition-colors">
-                  <Play className="w-10 h-10 text-white ml-1" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold mb-2">Plant Care Video Guide</h3>
-                <p className="text-white/70 text-sm">Coming Soon - Subscribe for updates!</p>
-              </div>
-              <img
-                src={media.images[0]}
-                alt="Video thumbnail"
-                className="absolute inset-0 w-full h-full object-cover opacity-30"
-              />
-            </div>
-            <p className="text-center text-sm text-[#8F9E8B] mt-3 flex items-center justify-center gap-2">
-              <Play className="w-4 h-4" />
-              Video tutorials coming soon to our channel
-            </p>
-          </div>
-        );
-      }
-
-      // Insert inline product recommendations after third section
-      if (sectionCount === 4 && media.relatedProducts.length > 0) {
-        const inlineProducts = media.relatedProducts
-          .slice(0, 4)
-          .map(id => products.find(p => p.id === id))
-          .filter((p): p is Product => p !== undefined);
-
-        elements.push(
-          <div key={`products-inline-${i}`} className="my-10 bg-gradient-to-r from-[#f0f4ef] to-[#e8ede7] rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <ShoppingCart className="w-5 h-5 text-[#2F4836]" />
-              <h3 className="font-heading font-semibold text-[#1A1A1A]">Shop These Plants</h3>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {inlineProducts.map(product => (
-                <Link key={product.id} href={`/product/${product.id}`}>
-                  <div className="bg-white rounded-lg p-3 text-center hover:shadow-md transition-shadow cursor-pointer group">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                    </div>
-                    <p className="text-xs font-medium text-[#1A1A1A] group-hover:text-[#2F4836] truncate">{product.name}</p>
-                    <p className="text-xs font-bold text-[#2F4836]">₹{product.price}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        );
-      }
-
     } else if (trimmed.match(/^\d+\.\s\*\*/)) {
       const text = trimmed.replace(/\*\*/g, "");
       const match = text.match(/^(\d+\.)\s(.+?)(?:\s-\s)(.+)$/);
@@ -251,20 +224,10 @@ function renderContent(content: string, postId: string) {
           <p className="text-[#4A4A4A] leading-relaxed">{trimmed.replace(/^-\s/, "")}</p>
         </div>
       );
-    } else if (trimmed.match(/^\*\*.+?\*\*:/)) {
-      const heading = trimmed.match(/^\*\*(.+?)\*\*:?\s*(.*)/);
-      if (heading) {
-        elements.push(
-          <p key={i} className="text-[#4A4A4A] leading-relaxed mb-4">
-            <span className="font-semibold text-[#1A1A1A]">{heading[1]}:</span> {heading[2]}
-          </p>
-        );
-      }
     } else {
       paragraphCount++;
       const parsed = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#1A1A1A] font-semibold">$1</strong>');
 
-      // Add pull quote styling for certain paragraphs
       if (paragraphCount === 3) {
         elements.push(
           <blockquote
@@ -290,22 +253,97 @@ function renderContent(content: string, postId: string) {
 
 export default function BlogDetail() {
   const [, params] = useRoute("/blog/:id");
-  const post = params?.id ? getBlogPostById(params.id) : undefined;
+  const [post, setPost] = useState<FirestoreBlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
 
-  const otherPosts = post
-    ? blogPosts.filter((p) => p.id !== post.id).slice(0, 3)
-    : [];
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!params?.id) {
+        setLoading(false);
+        return;
+      }
 
-  const readTime = post ? estimateReadTime(post.content) : 0;
+      try {
+        // First try Firestore
+        const docRef = doc(db, "blogPosts", params.id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setPost({
+            id: docSnap.id,
+            ...docSnap.data(),
+          } as FirestoreBlogPost);
+        } else {
+          // Fall back to static data
+          const staticPost = getBlogPostById(params.id);
+          if (staticPost) {
+            setPost({
+              id: staticPost.id,
+              title: staticPost.title,
+              excerpt: staticPost.excerpt,
+              image: staticPost.image,
+              content: staticPost.content,
+              author: staticPost.author,
+              date: staticPost.date,
+            });
+          }
+        }
+
+        // Fetch all posts for related articles
+        const posts = await fetchBlogPosts();
+        setAllPosts(posts);
+      } catch (error) {
+        console.error("Error fetching blog post:", error);
+        // Fall back to static data
+        const staticPost = getBlogPostById(params.id);
+        if (staticPost) {
+          setPost({
+            id: staticPost.id,
+            title: staticPost.title,
+            excerpt: staticPost.excerpt,
+            image: staticPost.image,
+            content: staticPost.content,
+            author: staticPost.author,
+            date: staticPost.date,
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [params?.id]);
+
+  const otherPosts = post ? allPosts.filter((p) => p.id !== post.id).slice(0, 3) : [];
+  const readTime = post
+    ? estimateReadTime(post.blocks && post.blocks.length > 0 ? post.blocks : post.content || "")
+    : 0;
   const media = post ? blogMedia[post.id] || { images: [], videos: [], relatedProducts: [] } : { images: [], videos: [], relatedProducts: [] };
+  const featuredImage = post?.featuredImage || post?.image || "";
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareTitle = post?.title || "";
 
-  // Get sidebar products
   const sidebarProducts = media.relatedProducts
-    .map(id => products.find(p => p.id === id))
+    .map((id) => products.find((p) => p.id === id))
     .filter((p): p is Product => p !== undefined);
+
+  // Determine if this is a block-based post
+  const hasBlocks = post?.blocks && post.blocks.length > 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f8faf7]">
+        <Header />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="w-8 h-8 text-[#2F4836] animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -340,7 +378,7 @@ export default function BlogDetail() {
       {/* Hero Image */}
       <div className="relative w-full h-[50vh] sm:h-[60vh] max-h-[600px] overflow-hidden">
         <img
-          src={post.image}
+          src={featuredImage}
           alt={post.title}
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
@@ -348,7 +386,6 @@ export default function BlogDetail() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-        {/* Back button on hero */}
         <div className="absolute top-6 left-6 sm:left-10">
           <Link href="/blog">
             <span
@@ -361,7 +398,6 @@ export default function BlogDetail() {
           </Link>
         </div>
 
-        {/* Title on hero */}
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 lg:p-16">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 mb-4">
@@ -383,11 +419,9 @@ export default function BlogDetail() {
       {/* Main Content Area with Sidebars */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
-          {/* Left Sidebar - Table of Contents & Share */}
+          {/* Left Sidebar */}
           <aside className="hidden lg:block lg:col-span-2">
             <div className="sticky top-24 space-y-6">
-              {/* Share buttons vertical */}
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <p className="text-xs text-[#8F9E8B] uppercase tracking-wider mb-3 font-semibold">Share</p>
                 <div className="flex flex-col gap-2">
@@ -418,7 +452,6 @@ export default function BlogDetail() {
                 </div>
               </div>
 
-              {/* Quick stats */}
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-2 text-sm text-[#4A4A4A] mb-3">
                   <Clock className="w-4 h-4 text-[#2F4836]" />
@@ -461,14 +494,20 @@ export default function BlogDetail() {
 
             {/* Article body */}
             <article className="prose-custom" data-testid="blog-detail-content">
-              {/* Excerpt/Lead paragraph */}
               {post.excerpt && (
                 <p className="text-xl sm:text-2xl text-[#4A4A4A] leading-relaxed mb-10 font-light border-l-4 border-[#2F4836] pl-6 bg-[#f0f4ef] py-4 rounded-r-lg">
                   {post.excerpt}
                 </p>
               )}
 
-              {renderContent(post.content, post.id)}
+              {/* Render template, blocks, or legacy content */}
+              {post.template ? (
+                <TemplateRenderer template={post.template} />
+              ) : hasBlocks ? (
+                <BlockRenderer blocks={post.blocks!} />
+              ) : post.content ? (
+                renderLegacyContent(post.content, post.id)
+              ) : null}
             </article>
 
             {/* Tags/CTA section */}
@@ -498,10 +537,9 @@ export default function BlogDetail() {
             </div>
           </main>
 
-          {/* Right Sidebar - Products & Related */}
+          {/* Right Sidebar */}
           <aside className="lg:col-span-3">
             <div className="sticky top-24 space-y-6">
-              {/* Featured Products */}
               {sidebarProducts.length > 0 && (
                 <div className="bg-white rounded-xl p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-4">
@@ -518,7 +556,6 @@ export default function BlogDetail() {
                 </div>
               )}
 
-              {/* Newsletter Signup */}
               <div className="bg-gradient-to-br from-[#2F4836] to-[#4a6b52] rounded-xl p-5 text-white">
                 <h3 className="font-heading font-semibold mb-2">Get Gardening Tips</h3>
                 <p className="text-sm text-white/80 mb-4">Weekly plant care advice delivered to your inbox.</p>
@@ -532,12 +569,11 @@ export default function BlogDetail() {
                 </button>
               </div>
 
-              {/* Related Articles */}
               {otherPosts.length > 0 && (
                 <div className="bg-white rounded-xl p-5 shadow-sm">
                   <h3 className="font-heading font-semibold text-[#1A1A1A] mb-4">Related Articles</h3>
                   <div className="space-y-4">
-                    {otherPosts.slice(0, 2).map(p => (
+                    {otherPosts.slice(0, 2).map((p) => (
                       <Link key={p.id} href={`/blog/${p.id}`}>
                         <div className="flex gap-3 group cursor-pointer">
                           <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">

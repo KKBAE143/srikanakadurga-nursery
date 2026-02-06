@@ -282,7 +282,7 @@ export default function AdminLayout({ children, title, subtitle, actions }: Admi
 
         {/* Page Content */}
         <div className="p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="w-full">{children}</div>
         </div>
       </main>
     </div>
