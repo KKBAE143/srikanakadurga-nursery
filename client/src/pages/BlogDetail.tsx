@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import BlockRenderer from "@/components/BlockRenderer";
 import TemplateRenderer from "@/components/TemplateRenderer";
 import { getBlogPostById, blogPosts, products, Product, fetchBlogPosts, type BlogPost } from "@/lib/data";
+import { getImageUrl } from "@/lib/images";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { ContentBlock } from "@/admin/components/blocks/types";
@@ -99,7 +100,7 @@ function ProductCard({ product }: { product: Product }) {
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group cursor-pointer border border-[#e5ebe3]">
         <div className="relative h-36 overflow-hidden">
           <img
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.name}
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
@@ -378,15 +379,15 @@ export default function BlogDetail() {
       {/* Hero Image */}
       <div className="relative w-full h-[50vh] sm:h-[60vh] max-h-[600px] overflow-hidden">
         <img
-          src={featuredImage}
+          src={getImageUrl(featuredImage)}
           alt={post.title}
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
           data-testid="img-blog-detail-hero"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10" />
 
-        <div className="absolute top-6 left-6 sm:left-10">
+        <div className="absolute top-6 left-6 sm:left-10 z-20">
           <Link href="/blog">
             <span
               className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm text-[#2F4836] px-4 py-2 rounded-full text-sm font-medium hover:bg-white transition-colors cursor-pointer shadow-lg"
@@ -398,7 +399,7 @@ export default function BlogDetail() {
           </Link>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 lg:p-16">
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 lg:p-16 z-20">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-[#2F4836] text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">

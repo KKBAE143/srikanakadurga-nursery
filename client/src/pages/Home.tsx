@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import { getImageUrl } from "@/lib/images";
 
 interface HeroSlide {
   id: string;
@@ -145,19 +146,19 @@ export default function Home() {
         {heroSlides.map((slide, i) => (
           <img
             key={slide.image}
-            src={slide.image}
-            alt={slide.alt}
+            src={getImageUrl(slide.image)}
+            alt={slide.alt || "Hero image"}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-              i === heroIdx ? "opacity-100" : "opacity-0"
+              i === heroIdx ? "opacity-100 z-0" : "opacity-0 z-0"
             }`}
             loading={i === 0 ? "eager" : "lazy"}
             decoding="async"
             data-testid={`img-hero-slide-${i}`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent z-10" />
 
-        <div className="relative h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-20 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p
             className={`text-white/80 text-sm font-heading tracking-[0.2em] uppercase mb-3 transition-all duration-300 ${
               textVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
@@ -209,7 +210,7 @@ export default function Home() {
           variant="ghost"
           size="icon"
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/20 text-white/80 backdrop-blur-sm"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 rounded-full bg-black/20 text-white/80 backdrop-blur-sm hover:bg-black/40"
           data-testid="button-hero-prev"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -218,18 +219,18 @@ export default function Home() {
           variant="ghost"
           size="icon"
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/20 text-white/80 backdrop-blur-sm"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 rounded-full bg-black/20 text-white/80 backdrop-blur-sm hover:bg-black/40"
           data-testid="button-hero-next"
         >
           <ChevronRight className="w-5 h-5" />
         </Button>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`rounded-full transition-all duration-300 ${
+              className={`rounded-full transition-all duration-300 cursor-pointer ${
                 i === heroIdx
                   ? "w-8 h-2 bg-white"
                   : "w-2 h-2 bg-white/50 hover:bg-white/70"
@@ -255,14 +256,14 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="relative rounded-sm overflow-hidden h-[300px] lg:h-full">
             <img
-              src="/images/new-arrivals-banner.webp"
+              src={getImageUrl("/images/new-arrivals-banner.webp")}
               alt="New fresh arrivals"
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <div className="relative h-full flex flex-col justify-end p-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
+            <div className="relative z-20 h-full flex flex-col justify-end p-6">
               <p className="text-white text-sm font-heading tracking-wider uppercase mb-1">Buy New</p>
               <h3 className="text-white text-xl font-heading font-bold uppercase tracking-wide">
                 Fresh Arrivals
@@ -283,7 +284,7 @@ export default function Home() {
           <div className="relative flex justify-center">
             <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden border-4 border-[#dde3dc]">
               <img
-                src="/images/plant-cluster.webp"
+                src={getImageUrl("/images/plant-cluster.webp")}
                 alt="House plants collection"
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -337,14 +338,14 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative h-[220px] rounded-sm overflow-hidden group">
             <img
-              src="/images/category-house-shape.webp"
+              src={getImageUrl("/images/category-house-shape.webp")}
               alt="House Shape Plants"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="relative h-full flex flex-col justify-center px-8">
+            <div className="absolute inset-0 bg-black/20 z-10" />
+            <div className="relative z-20 h-full flex flex-col justify-center px-8">
               <p className="text-white/80 text-xs font-heading tracking-wider uppercase mb-1">Only On Our Store</p>
               <h3 className="text-white text-2xl font-heading font-bold tracking-wide mb-4">
                 House Shape<br />Plant
@@ -362,14 +363,14 @@ export default function Home() {
 
           <div className="relative h-[220px] rounded-sm overflow-hidden group">
             <img
-              src="/images/category-indoor.webp"
+              src={getImageUrl("/images/category-indoor.webp")}
               alt="Indoor Life Plants"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="relative h-full flex flex-col justify-center px-8">
+            <div className="absolute inset-0 bg-black/20 z-10" />
+            <div className="relative z-20 h-full flex flex-col justify-center px-8">
               <p className="text-white/80 text-xs font-heading tracking-wider uppercase mb-1">Only On Our Store</p>
               <h3 className="text-white text-2xl font-heading font-bold tracking-wide mb-4">
                 Indoor Life<br />Plants

@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { getImageUrl } from "@/lib/images";
 
 interface ProductCardProps {
   product: Product;
@@ -134,7 +135,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`}>
         <div className="aspect-square bg-gradient-to-br from-[#f8faf7] to-[#EAEFE9] overflow-hidden relative cursor-pointer">
           <img
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.name}
             className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
             loading="lazy"

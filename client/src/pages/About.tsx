@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import OptimizedImage from "@/components/OptimizedImage";
+import { getImageUrl } from "@/lib/images";
 
 export default function About() {
   const stats = [
@@ -202,7 +204,7 @@ export default function About() {
                 <div className="space-y-4">
                   <div className="rounded-2xl overflow-hidden shadow-lg">
                     <img
-                      src="/images/founder-plants.png"
+                      src={getImageUrl("/images/founder-plants.png")}
                       alt="Founder with nursery plants"
                       className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
                       loading="eager"
@@ -211,7 +213,7 @@ export default function About() {
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-lg">
                     <img
-                      src="/images/nursery-2.jpeg"
+                      src={getImageUrl("/images/nursery-2.jpeg")}
                       alt="Variety of indoor plants"
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -222,7 +224,7 @@ export default function About() {
                 <div className="space-y-4 pt-8">
                   <div className="rounded-2xl overflow-hidden shadow-lg">
                     <img
-                      src="/images/nursery-3.jpeg"
+                      src={getImageUrl("/images/nursery-3.jpeg")}
                       alt="Flowering plants section"
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -231,7 +233,7 @@ export default function About() {
                   </div>
                   <div className="rounded-2xl overflow-hidden shadow-lg">
                     <img
-                      src="/images/nursery-4.jpeg"
+                      src={getImageUrl("/images/nursery-4.jpeg")}
                       alt="Potted plants arrangement"
                       className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -445,7 +447,7 @@ export default function About() {
               data-testid={`img-strip-${i}`}
             >
               <img
-                src={photo.src}
+                src={getImageUrl(photo.src)}
                 alt={photo.alt}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                 loading="lazy"

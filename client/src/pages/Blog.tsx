@@ -4,6 +4,7 @@ import { blogPosts as staticBlogs, fetchBlogPosts, type BlogPost } from "@/lib/d
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
+import { getImageUrl } from "@/lib/images";
 import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 
 export default function Blog() {
@@ -64,7 +65,7 @@ export default function Blog() {
               <div className="grid md:grid-cols-2">
                 <div className="relative h-64 md:h-80 overflow-hidden">
                   <img
-                    src={featuredPost.image}
+                    src={getImageUrl(featuredPost.image)}
                     alt={featuredPost.title}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="eager"
@@ -135,7 +136,7 @@ export default function Blog() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={post.image}
+                    src={getImageUrl(post.image)}
                     alt={post.title}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"

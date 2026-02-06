@@ -94,6 +94,7 @@
     "autoprefixer": "^10.4.20",
     "cross-env": "^10.1.0",
     "esbuild": "^0.25.0",
+    "imagekit": "^6.0.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.20.5",

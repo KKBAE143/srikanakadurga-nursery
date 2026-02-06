@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getWishlistItems, removeFromWishlist, addCartItem } from "@/lib/firestore";
 import { getProductById, type Product } from "@/lib/data";
+import { getImageUrl } from "@/lib/images";
 import { useToast } from "@/hooks/use-toast";
 import {
   Heart,
@@ -217,7 +218,7 @@ export default function Wishlist() {
                       <Link href={`/product/${product.id}`}>
                         <div className="relative w-full sm:w-40 h-40 bg-gradient-to-br from-[#f8faf7] to-[#EAEFE9] flex-shrink-0 cursor-pointer overflow-hidden">
                           <img
-                            src={product.image}
+                            src={getImageUrl(product.image)}
                             alt={product.name}
                             className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
                           />

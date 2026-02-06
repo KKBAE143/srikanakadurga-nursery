@@ -32,6 +32,7 @@ import {
   isInWishlist,
 } from "@/lib/firestore";
 import { getProductById, products, type Product } from "@/lib/data";
+import { getImageUrl } from "@/lib/images";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/product/:id");
@@ -232,7 +233,7 @@ export default function ProductDetail() {
               </div>
 
               <img
-                src={product.image}
+                src={getImageUrl(product.image)}
                 alt={product.name}
                 className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 loading="eager"
@@ -244,7 +245,7 @@ export default function ProductDetail() {
             <div className="hidden sm:flex gap-3">
               <div className="w-20 h-20 bg-white rounded-xl border-2 border-[#2F4836] p-2 cursor-pointer">
                 <img
-                  src={product.image}
+                  src={getImageUrl(product.image)}
                   alt={product.name}
                   className="w-full h-full object-contain"
                 />
