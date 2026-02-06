@@ -1,0 +1,74 @@
+Note to AI: I am providing reference images. Please clone the exact visual style, color palette, padding, border radius, and typography of the 'LeafyHeaven' screenshots provided, but change the branding to 'Srikanakadurganursery'.
+Color Palette (Extracted from images):
+Backgrounds: Light Sage/Beige (#EAEFE9) for the body, Clean White (#FFFFFF) for content cards and input fields.
+Primary Action (Buttons/Footer): Dark Forest Green (#2F4836).
+Secondary Accent: Muted Olive (#8F9E8B) for checkout buttons or highlights.
+Text: Dark Charcoal (#1A1A1A) for headings, Dark Grey (#4A4A4A) for body.
+Typography: Modern Sans-Serif (similar to 'Josefin Sans' or 'Poppins'). Clean, widely spaced.
+UI Shapes: Sharp to slightly rounded corners (approx 0px to 4px radius). Minimalist borders.
+Shadows: Very soft, large diffusion shadows on product cards; flat design elsewhere.
+1. Landing Page Prompt (Home)
+Prompt:
+"Generate a high-fidelity Home page for 'Srikanakadurganursery' that is an exact structural replica of the 'LeafyHeaven' reference image provided.
+1. Header: A sticky navigation bar with a light sage background (#EAEFE9). Left: Text logo 'Srikanakadurganursery' (with a small leaf icon). Center: Links 'Home', 'Shop', 'Landscaping', 'Contact'. Right: Search bar (white background, rounded), User Icon, Cart Icon.
+2. Hero Section: Full-width banner. Background image: Dark, lush close-up of green leaves (monstera/fern). Center text overlay in White: 'Let's Make Your Home Beautiful'. Subtext: 'Premium plants and landscaping in Hyderabad.' Button: Green pill-shaped button 'Shop Now'.
+3. New Arrivals/Slider: A section titled 'New Arrivals'. Layout: Split screen. Left side is a large banner image of a cactus/succulent with text 'Buy New Fresh Arrivals'. Right side: A 2x2 grid of product cards.
+4. Product Card Style: White background, square aspect ratio. Image of plant in pastel pot. Below image: Plant Name (e.g., 'Areca Palm'), Star Rating (Yellow), Price (₹450), and a shopping cart icon button.
+5. Mid-Section Banner: A circular masked image on the left showing a plant cluster. Text on right: 'A Great Addition - House Plants'. Button: 'Shop Now'.
+6. Categories: Two wide banners side-by-side. Left: 'House Shape Plant' (Beige bg). Right: 'Indoor Life Plants' (Light Blue bg). Both with 'Check Now' buttons.
+7. Footer: Full-width Dark Forest Green (#2F4836) background. White text. Columns: 'Contact Us' (Address: Ramanthapur, Hyderabad), 'Quick Links', 'My Account', 'Customer Service'. Bottom: 'Powered by Srikanakadurganursery © 2026'.
+Strict Constraint: Keep the exact spacing, font hierarchy, and button styles as the reference image."
+2. Shop Page (E-commerce Listing)
+Prompt:
+"Create a Shop/Product Listing page for 'Srikanakadurganursery' based exactly on the 'LeafyHeaven' shop reference.
+1. Header: Reuse the global header (Logo, Nav, Search, Icons) on the Light Sage background.
+2. Hero Banner: A slim, full-width banner with a photo of succulents on a shelf. Overlay text: 'Shop With Us'.
+3. Main Layout: Two-column layout.
+Left Sidebar (Filters): Title 'Filter & Sort'. List of categories with square checkboxes: 'Flowering Plants', 'Indoor Plants', 'Succulent Plants', 'Medicinal Plants'. Below that: 'Sort By' checkboxes (Price Low to High, etc.). Clean, minimalist lines.
+Right Content (Grid): A 3-column grid of product cards.
+4. Product Card Detail:
+Image: Vertical rectangle, white background, plant in a pot (Use Indian variety placeholders like Tulsi, Jade, Money Plant).
+Info: Below image, left aligned. Plant Name, Star Rating (5 yellow stars), Price (e.g., ₹250).
+Icons: Heart (Wishlist) and Cart icon on the bottom right of the card.
+5. Pagination: At the bottom, simple square buttons: '1', '2', '>' centered.
+6. Footer: Reuse the Dark Forest Green global footer."
+3. Blog / Articles Page
+Prompt:
+"Design a Blog page for 'Srikanakadurganursery' replicating the list-view layout of the reference.
+1. Hero Section: Full-width dark botanical image. Large white centered text: 'Glorify the Nature around You'.
+2. Blog List Layout: A vertical stack of articles.
+Article Card 1: Image on Left (White pot with plants), Text on Right. Title: 'A Guide to Stunning Indoor Plants'. Body: 'Lorem ipsum style text about gardening tips...'. Link: Underlined text 'CONTINUE READING' in all caps.
+Article Card 2: Image on Left (Bonsai tree), Text on Right. Title: 'The World's Rarest Plant: A Journey'.
+Article Card 3: Image on Left (Interior living room with plants). Title: 'Indoor Plant Styling in Hyderabad'.
+3. Styling: Images should be rectangular landscape ratio. Text should be vertically centered relative to the image. Background of the page should be White.
+4. Footer: Reuse the Dark Forest Green global footer."
+4. Cart Page
+Prompt:
+"Design a minimalist Shopping Cart page for 'Srikanakadurganursery' identical to the reference.
+1. Header: Global header on Light Sage background.
+2. Hero: Dark leaf background banner. Text centered: 'Cart'.
+3. Cart Content:
+Table Header: Simple text labels: 'PRODUCT', 'QUANTITY', 'SUBTOTAL', 'REMOVE'.
+Cart Item Row:
+Product: Small square thumbnail of plant + Name 'Snake Plant'.
+Quantity: A simple white box with the number '1'.
+Subtotal: Text '₹350'.
+Remove: A trash can icon.
+4. Cart Total Section (Right Side):
+A clean layout without a border.
+Title: 'Cart Total'.
+Rows: 'Cart Subtotal: ₹350', 'Shipping: Free', 'Total: ₹350' (Bold).
+Button: Large, wide rectangular button in Muted Olive Green (#8F9E8B). Text: 'Checkout'.
+5. Footer: Reuse the Dark Forest Green global footer."
+5. Contact Page
+Prompt:
+"Design a Contact Us page for 'Srikanakadurganursery' that mirrors the reference layout exactly.
+1. Hero: Dark leaf background banner. Text centered: 'We Love to Hear from You'.
+2. Main Content Area: Split layout (Left and Right).
+Left Side (Form): Title 'Let's Talk'. Fields: 'Full Name', 'Email', 'Your Message'. All fields are simple lines (underline style) or very minimal borders. Button: Dark Green rectangular button 'Send'.
+Right Side (Info):
+Address: 'Ramanthapur, Hyderabad, Telangana - 500013'.
+Contact: Phone number and email 'support@srikanakadurganursery.com'.
+Timings: 'Monday to Saturday: 8 am - 8 pm'.
+3. Styling: Plenty of white space. Fonts should be serif for headings ('Let's Talk') and sans-serif for body text.
+4. Footer: Reuse the Dark Forest Green global footer."
