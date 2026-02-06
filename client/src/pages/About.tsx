@@ -8,19 +8,19 @@ export default function About() {
     <div className="min-h-screen bg-[#EAEFE9]">
       <Header />
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4" data-testid="section-about-headline">
+      <section className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 pt-10 pb-4" data-testid="section-about-headline">
         <h1
           className="font-heading text-[clamp(3rem,10vw,8rem)] font-bold text-[#1A1A1A] uppercase tracking-wider leading-[0.9]"
           data-testid="text-about-headline"
         >
-          Grown With
+          Our Story,
           <br />
-          <span className="text-[#2F4836]">Care & Trust</span>
+          <span className="text-[#2F4836]">Our Roots</span>
         </h1>
         <p className="mt-4 text-[#4A4A4A] text-base tracking-wide uppercase font-heading">The Srikanakadurga Story</p>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-testid="section-passion">
+      <section className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-12" data-testid="section-passion">
         <div className="grid grid-cols-12 gap-4 md:gap-6 items-start">
           <div className="col-span-12 md:col-span-7 relative">
             <div className="grid grid-cols-2 gap-3">
@@ -58,12 +58,12 @@ export default function About() {
             <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1A1A1A] uppercase tracking-[0.15em] mb-6" data-testid="text-passion-heading">
               Rooted in Nature
             </h2>
-            <p className="text-[#4A4A4A] text-sm leading-relaxed mb-4 max-w-sm">
+            <p className="text-[#4A4A4A] text-sm leading-relaxed mb-4">
               Driven by a deep-rooted passion, Srikanakadurga Nursery's journey from
               a small plot in Ramanthapur reflects our relentless ambition to bring the
               finest greenery to every home in Hyderabad.
             </p>
-            <p className="text-[#4A4A4A] text-sm leading-relaxed max-w-sm">
+            <p className="text-[#4A4A4A] text-sm leading-relaxed">
               We believe every space, from a modest balcony to a sprawling garden,
               deserves the transformative touch of nature. Our team of expert
               horticulturists handpicks and nurtures each plant with care.
@@ -72,7 +72,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-testid="section-the-nursery">
+      <section className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-12" data-testid="section-the-nursery">
         <div className="grid grid-cols-12 gap-4 md:gap-6 items-start">
           <div className="col-span-12 md:col-span-5 order-2 md:order-1">
             <div className="grid grid-cols-2 gap-3">
@@ -109,7 +109,7 @@ export default function About() {
               <p className="font-heading text-xs font-semibold text-[#2F4836] uppercase tracking-[0.2em] mb-3" data-testid="text-the-nursery-label">
                 The Nursery
               </p>
-              <p className="text-[#4A4A4A] text-sm leading-relaxed max-w-sm">
+              <p className="text-[#4A4A4A] text-sm leading-relaxed">
                 Nestled in the heart of Ramanthapur, Hyderabad, our nursery
                 has been a haven for plant lovers and gardening enthusiasts for years.
                 What started as a humble passion project has grown into one of the
@@ -140,7 +140,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24" data-testid="section-journey">
+      <section className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-16 md:py-24" data-testid="section-journey">
         <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1A1A1A] uppercase tracking-[0.2em] text-center mb-16" data-testid="text-journey-heading">
           Our Journey
         </h2>
@@ -193,7 +193,7 @@ export default function About() {
               </div>
 
               <div className="pl-4 sm:pl-8 flex-1 pt-0.5">
-                <p className="text-[#4A4A4A] text-sm leading-relaxed max-w-md">
+                <p className="text-[#4A4A4A] text-sm leading-relaxed">
                   {item.text}
                 </p>
               </div>
@@ -252,7 +252,7 @@ export default function About() {
       </section>
 
       <section className="bg-[#2F4836] py-16" data-testid="section-about-info">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div data-testid="about-location">
               <MapPin className="w-5 h-5 text-white/60 mx-auto mb-3" />
