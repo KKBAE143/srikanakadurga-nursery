@@ -27,7 +27,7 @@ export default function About() {
                 <img
                   src="/images/nursery-1.jpeg"
                   alt="Nursery entrance and plant display"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="eager"
                   data-testid="img-about-collage-1"
                 />
@@ -36,7 +36,7 @@ export default function About() {
                 <img
                   src="/images/nursery-2.jpeg"
                   alt="Variety of indoor plants"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
                   data-testid="img-about-collage-2"
                 />
@@ -45,7 +45,7 @@ export default function About() {
                 <img
                   src="/images/nursery-3.jpeg"
                   alt="Flowering plants section"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
                   data-testid="img-about-collage-3"
                 />
@@ -79,7 +79,7 @@ export default function About() {
                 <img
                   src="/images/nursery-4.jpeg"
                   alt="Potted plants arrangement"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
                   data-testid="img-about-nursery-1"
                 />
@@ -88,7 +88,7 @@ export default function About() {
                 <img
                   src="/images/nursery-5.jpeg"
                   alt="Garden supplies and pots"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
                   data-testid="img-about-nursery-2"
                 />
@@ -97,7 +97,7 @@ export default function About() {
                 <img
                   src="/images/nursery-6.jpeg"
                   alt="Outdoor plants area"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
                   data-testid="img-about-nursery-3"
                 />
@@ -122,7 +122,7 @@ export default function About() {
               <img
                 src="/images/nursery-7.jpeg"
                 alt="Succulent collection"
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 loading="lazy"
                 data-testid="img-about-nursery-4"
               />
@@ -218,7 +218,7 @@ export default function About() {
               <img
                 src={photo.src}
                 alt={photo.alt}
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 loading="lazy"
                 decoding="async"
               />
