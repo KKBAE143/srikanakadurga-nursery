@@ -13,9 +13,9 @@ export default function About() {
           className="font-heading text-[clamp(3rem,10vw,8rem)] font-bold text-[#1A1A1A] uppercase tracking-wider leading-[0.9]"
           data-testid="text-about-headline"
         >
-          Hamari
+          Grown With
           <br />
-          <span className="text-[#2F4836]">Hari Virasat</span>
+          <span className="text-[#2F4836]">Care & Trust</span>
         </h1>
         <p className="mt-4 text-[#4A4A4A] text-base tracking-wide uppercase font-heading">The Srikanakadurga Story</p>
       </section>
