@@ -13,10 +13,11 @@ export default function About() {
           className="font-heading text-[clamp(3rem,10vw,8rem)] font-bold text-[#1A1A1A] uppercase tracking-wider leading-[0.9]"
           data-testid="text-about-headline"
         >
-          Know
+          Hamari
           <br />
-          <span className="text-[#2F4836]">Srikanakadurga</span>
+          <span className="text-[#2F4836]">Hari Virasat</span>
         </h1>
+        <p className="mt-4 text-[#4A4A4A] text-base tracking-wide uppercase font-heading">The Srikanakadurga Story</p>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-testid="section-passion">
@@ -25,8 +26,8 @@ export default function About() {
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 overflow-hidden" style={{ maxHeight: "420px" }}>
                 <img
-                  src="/images/nursery-1.jpeg"
-                  alt="Nursery entrance and plant display"
+                  src="/images/founder-plants.png"
+                  alt="Founder with nursery plants"
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="eager"
                   data-testid="img-about-collage-1"
@@ -207,7 +208,7 @@ export default function About() {
             { src: "/images/nursery-8.jpeg", alt: "Plant care and maintenance area" },
             { src: "/images/nursery-9.jpeg", alt: "Decorative plants display" },
             { src: "/images/nursery-10.jpeg", alt: "Nursery panorama" },
-            { src: "/images/nursery-3.jpeg", alt: "Flowering plants section" },
+            { src: "/images/plant-delivery.png", alt: "Plant delivery truck" },
           ].map((photo, i) => (
             <div
               key={i}
