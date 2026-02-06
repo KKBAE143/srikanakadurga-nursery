@@ -15,6 +15,7 @@ export default function Header() {
   const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
 
   // Filter products based on search query
@@ -34,17 +35,37 @@ export default function Header() {
   // Close search dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Close search dropdown
       if (
         searchRef.current &&
         !searchRef.current.contains(event.target as Node) &&
-        mobileSearchRef.current &&
-        !mobileSearchRef.current.contains(event.target as Node)
+        (!mobileSearchRef.current || !mobileSearchRef.current.contains(event.target as Node))
       ) {
         setSearchFocused(false);
       }
+      // Close user menu dropdown
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
     };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSearchFocused(false);
+        setUserMenuOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
   }, []);
 
   useEffect(() => {
@@ -231,7 +252,7 @@ export default function Header() {
                   </div>
                 </Link>
 
-                <div className="relative">
+                <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="p-1.5 text-white/80 hover:text-white transition-colors"
@@ -250,39 +271,94 @@ export default function Header() {
                     )}
                   </button>
                   {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-100 min-w-[200px] py-2 z-50" data-testid="user-dropdown">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-heading font-semibold text-[#1A1A1A] truncate">
-                          {user.displayName || "User"}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-[#e5ebe3] min-w-[280px] overflow-hidden z-50" data-testid="user-dropdown">
+                      {/* User Info Header */}
+                      <div className="bg-gradient-to-br from-[#2F4836] to-[#1a2e1f] p-4">
+                        <div className="flex items-center gap-3">
+                          {user.photoURL ? (
+                            <img
+                              src={user.photoURL}
+                              alt={user.displayName || ""}
+                              className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-[#a8d5a2] text-[#1a2e1f] flex items-center justify-center text-lg font-bold">
+                              {(user.displayName || user.email || "U")[0].toUpperCase()}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-heading font-semibold text-white truncate">
+                              {user.displayName || "Welcome"}
+                            </p>
+                            <p className="text-xs text-white/60 truncate">{user.email}</p>
+                          </div>
+                        </div>
                       </div>
-                      <Link href="/profile">
-                        <span
-                          onClick={() => setUserMenuOpen(false)}
-                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                          data-testid="link-profile"
-                        >
-                          My Profile
-                        </span>
-                      </Link>
-                      <Link href="/wishlist">
-                        <span
-                          onClick={() => setUserMenuOpen(false)}
-                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                          data-testid="link-wishlist-menu"
-                        >
-                          Wishlist
-                        </span>
-                      </Link>
-                      <div className="border-t border-gray-100 mt-1 pt-1">
+
+                      {/* Menu Items */}
+                      <div className="p-2">
+                        <Link href="/profile">
+                          <span
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#1A1A1A] hover:bg-[#f8faf7] cursor-pointer transition-colors"
+                            data-testid="link-profile"
+                          >
+                            <div className="w-8 h-8 bg-[#EAEFE9] rounded-lg flex items-center justify-center">
+                              <User className="w-4 h-4 text-[#2F4836]" />
+                            </div>
+                            <div>
+                              <p className="font-medium">My Profile</p>
+                              <p className="text-xs text-[#8F9E8B]">View account details</p>
+                            </div>
+                          </span>
+                        </Link>
+
+                        <Link href="/wishlist">
+                          <span
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#1A1A1A] hover:bg-[#f8faf7] cursor-pointer transition-colors"
+                            data-testid="link-wishlist-menu"
+                          >
+                            <div className="w-8 h-8 bg-[#EAEFE9] rounded-lg flex items-center justify-center">
+                              <Heart className="w-4 h-4 text-[#2F4836]" />
+                            </div>
+                            <div>
+                              <p className="font-medium">Wishlist</p>
+                              <p className="text-xs text-[#8F9E8B]">Your saved plants</p>
+                            </div>
+                          </span>
+                        </Link>
+
+                        <Link href="/cart">
+                          <span
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#1A1A1A] hover:bg-[#f8faf7] cursor-pointer transition-colors"
+                          >
+                            <div className="w-8 h-8 bg-[#EAEFE9] rounded-lg flex items-center justify-center">
+                              <ShoppingCart className="w-4 h-4 text-[#2F4836]" />
+                            </div>
+                            <div>
+                              <p className="font-medium">My Cart</p>
+                              <p className="text-xs text-[#8F9E8B]">{cartCount} item{cartCount !== 1 ? "s" : ""} in cart</p>
+                            </div>
+                          </span>
+                        </Link>
+                      </div>
+
+                      {/* Sign Out */}
+                      <div className="border-t border-[#e5ebe3] p-2">
                         <button
                           onClick={handleSignOut}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2"
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
                           data-testid="button-signout"
                         >
-                          <LogOut className="w-4 h-4" />
-                          Sign Out
+                          <div className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                            <LogOut className="w-4 h-4 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Sign Out</p>
+                            <p className="text-xs text-red-400">Log out of your account</p>
+                          </div>
                         </button>
                       </div>
                     </div>
