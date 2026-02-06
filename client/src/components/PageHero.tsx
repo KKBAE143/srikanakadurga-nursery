@@ -11,6 +11,8 @@ export default function PageHero({ image, title, subtitle }: PageHeroProps) {
         src={image}
         alt={title}
         className="absolute inset-0 w-full h-full object-cover"
+        loading="eager"
+        decoding="async"
       />
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative h-full flex flex-col items-center justify-center text-white px-4">
