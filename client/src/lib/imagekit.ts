@@ -2,8 +2,8 @@
 // Client-side public configuration only
 
 export const IMAGEKIT_CONFIG = {
-  publicKey: "public_u4RMvhnxcY+obKITfeCIpskSxPM=",
-  urlEndpoint: "https://ik.imagekit.io/vvkwy0zte",
+  publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY || "public_u4RMvhnxcY+obKITfeCIpskSxPM=",
+  urlEndpoint: import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT || "https://ik.imagekit.io/vvkwy0zte",
 };
 
 // Helper to generate ImageKit URL with transformations
