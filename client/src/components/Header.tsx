@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Menu, X, LogOut, Heart, Star, ArrowRight, Settings } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, LogOut, Heart, Star, ArrowRight, Settings, Package } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -358,6 +358,22 @@ export default function Header() {
                             <div>
                               <p className="font-medium">My Cart</p>
                               <p className="text-xs text-[#8F9E8B]">{cartCount} item{cartCount !== 1 ? "s" : ""} in cart</p>
+                            </div>
+                          </span>
+                        </Link>
+
+                        <Link href="/orders">
+                          <span
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#1A1A1A] hover:bg-[#f8faf7] cursor-pointer transition-colors"
+                            data-testid="link-orders-menu"
+                          >
+                            <div className="w-8 h-8 bg-[#EAEFE9] rounded-lg flex items-center justify-center">
+                              <Package className="w-4 h-4 text-[#2F4836]" />
+                            </div>
+                            <div>
+                              <p className="font-medium">My Orders</p>
+                              <p className="text-xs text-[#8F9E8B]">Track your orders</p>
                             </div>
                           </span>
                         </Link>

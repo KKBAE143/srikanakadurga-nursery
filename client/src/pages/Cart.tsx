@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Trash2, Plus, Minus, ShoppingCart as CartIcon } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { getCartItems, updateCartItemQty, removeCartItem } from "@/lib/firestore";
 import { getProductById, type Product } from "@/lib/data";
+import { getImageUrl } from "@/lib/images";
 
 interface CartItemDisplay {
   id: string;
@@ -18,6 +19,7 @@ interface CartItemDisplay {
 export default function Cart() {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [cartItems, setCartItems] = useState<CartItemDisplay[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -148,7 +150,7 @@ export default function Cart() {
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-[#f8f9f7] rounded-sm overflow-hidden flex-shrink-0">
                         <img
-                          src={item.product?.image || ""}
+                          src={getImageUrl(item.product?.image || "")}
                           alt={item.product?.name || ""}
                           className="w-full h-full object-contain p-2"
                           loading="lazy"
@@ -229,6 +231,7 @@ export default function Cart() {
               </div>
 
               <button
+                onClick={() => setLocation("/checkout")}
                 className="w-full mt-6 bg-[#2F4836] text-white py-3.5 font-heading text-sm tracking-wider uppercase hover:bg-[#3a5a44] transition-colors"
                 data-testid="button-checkout"
               >
