@@ -5,16 +5,20 @@ import Footer from "@/components/Footer";
 import { Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { getCartItems, updateCartItemQty, removeCartItem, type CartItem, type Product } from "@/lib/firestore";
+import { getCartItems, updateCartItemQty, removeCartItem } from "@/lib/firestore";
+import { getProductById, type Product } from "@/lib/data";
 
-interface CartItemWithProduct extends CartItem {
+interface CartItemDisplay {
+  id: string;
+  productId: string;
+  quantity: number;
   product?: Product;
 }
 
 export default function Cart() {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
+  const [cartItems, setCartItems] = useState<CartItemDisplay[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadCart = async () => {
@@ -22,7 +26,11 @@ export default function Cart() {
     setLoading(true);
     try {
       const items = await getCartItems(user.uid);
-      setCartItems(items);
+      const enriched = items.map((item) => ({
+        ...item,
+        product: getProductById(item.productId),
+      }));
+      setCartItems(enriched);
     } catch {
       toast({ title: "Error", description: "Failed to load cart", variant: "destructive" });
     } finally {

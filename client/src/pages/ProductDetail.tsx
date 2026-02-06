@@ -6,38 +6,25 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { getProduct, getProducts, addCartItem, addToWishlist, removeFromWishlist, isInWishlist, type Product } from "@/lib/firestore";
+import { addCartItem, addToWishlist, removeFromWishlist, isInWishlist } from "@/lib/firestore";
+import { getProductById, products, type Product } from "@/lib/data";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/product/:id");
   const { user } = useAuth();
   const { toast } = useToast();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [wishlisted, setWishlisted] = useState(false);
   const [adding, setAdding] = useState(false);
 
+  const product = params?.id ? getProductById(params.id) : undefined;
+  const relatedProducts = product
+    ? products.filter((rp) => rp.category === product.category && rp.id !== product.id).slice(0, 4)
+    : [];
+
   useEffect(() => {
-    if (!params?.id) return;
-    const load = async () => {
-      setLoading(true);
-      const p = await getProduct(params.id);
-      setProduct(p);
-      if (p) {
-        const allProducts = await getProducts();
-        setRelatedProducts(
-          allProducts.filter((rp) => rp.category === p.category && rp.id !== p.id).slice(0, 4)
-        );
-        if (user) {
-          const inWish = await isInWishlist(user.uid, p.id);
-          setWishlisted(inWish);
-        }
-      }
-      setLoading(false);
-    };
-    load();
-  }, [params?.id, user]);
+    if (!user || !product) return;
+    isInWishlist(user.uid, product.id).then(setWishlisted).catch(() => {});
+  }, [user, product?.id]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -77,24 +64,6 @@ export default function ProductDetail() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#EAEFE9]">
-        <Header />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-pulse">
-            <div className="aspect-square bg-white rounded-sm" />
-            <div className="space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-3/4" />
-              <div className="h-5 bg-gray-200 rounded w-1/4" />
-              <div className="h-20 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!product) {
     return (
       <div className="min-h-screen bg-[#EAEFE9]">
@@ -102,7 +71,7 @@ export default function ProductDetail() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <p className="font-heading text-xl text-[#1A1A1A]">Product not found</p>
           <Link href="/shop">
-            <button className="mt-4 bg-[#2F4836] text-white px-6 py-2 font-heading text-sm tracking-wider uppercase">
+            <button className="mt-4 bg-[#2F4836] text-white px-6 py-2 font-heading text-sm tracking-wider uppercase" data-testid="button-back-to-shop">
               Back to Shop
             </button>
           </Link>

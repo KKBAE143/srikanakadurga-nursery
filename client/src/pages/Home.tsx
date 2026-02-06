@@ -1,19 +1,13 @@
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
-import { Star, Truck, CreditCard, RotateCcw, Phone, ChevronLeft, ChevronRight } from "lucide-react";
-import { getProducts, type Product } from "@/lib/firestore";
+import { useState } from "react";
+import { Truck, CreditCard, RotateCcw, Phone, ChevronLeft, ChevronRight } from "lucide-react";
+import { products } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
-
-  useEffect(() => {
-    getProducts().then((p) => { setProducts(p); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
 
   const newArrivals = products.slice(0, 4);
   const bestSellers = products.filter(p => p.rating >= 5).slice(0, 4);
@@ -100,21 +94,9 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {loading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-sm animate-pulse">
-                  <div className="aspect-square bg-gray-200" />
-                  <div className="p-3 space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              newArrivals.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            )}
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </section>
@@ -224,31 +206,6 @@ export default function Home() {
                 </button>
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-16" data-testid="section-why-choose">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <p className="text-[#8F9E8B] text-sm font-heading tracking-wider uppercase mb-2">Our Promise</p>
-            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1A1A1A] uppercase tracking-wide">
-              Why Choose Us
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: "🌿", title: "Hand-Picked Quality", desc: "Every plant is carefully selected and inspected before delivery to ensure you receive only the healthiest specimens." },
-              { icon: "🚚", title: "Safe Delivery", desc: "Expert packaging and same-day delivery across Hyderabad. Your plants arrive fresh and ready to thrive." },
-              { icon: "💬", title: "Expert Guidance", desc: "Our team of plant experts provides personalized care tips and ongoing support for your green journey." },
-              { icon: "♻️", title: "Eco-Friendly", desc: "We use sustainable growing practices and biodegradable packaging to minimize our environmental footprint." },
-            ].map((item, i) => (
-              <div key={i} className="text-center p-6" data-testid={`why-choose-${i}`}>
-                <div className="text-3xl mb-4">{item.icon}</div>
-                <h4 className="font-heading text-sm font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wider">{item.title}</h4>
-                <p className="text-xs text-[#4A4A4A] leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

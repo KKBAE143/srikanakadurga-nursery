@@ -1,5 +1,5 @@
 import { Heart, ShoppingCart, Star } from "lucide-react";
-import type { Product } from "@/lib/firestore";
+import type { Product } from "@/lib/data";
 import { addCartItem, addToWishlist, removeFromWishlist, isInWishlist } from "@/lib/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";

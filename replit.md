@@ -1,37 +1,44 @@
 # Srikanakadurganursery
 
 ## Overview
-A plant nursery e-commerce website for "Srikanakadurganursery" based in Ramanthapur, Hyderabad. Features sage green color palette, minimalist typography, and botanical imagery with Firebase authentication and Firestore database.
+A plant nursery e-commerce website for "Srikanakadurganursery" based in Ramanthapur, Hyderabad. Features sage green color palette, minimalist typography, and botanical imagery with Firebase authentication and Firestore for user-specific data.
 
 ## Recent Changes
-- 2026-02-06: Migrated from PostgreSQL/Express API to Firebase/Firestore for all data operations
+- 2026-02-06: Migrated product/blog data from Firestore to local data.ts module (eliminates Firebase dependency for browsing)
+- 2026-02-06: Created About Us page with 10 nursery photos gallery, story, values, and visit info
+- 2026-02-06: Added "About" link to header navigation
+- 2026-02-06: Removed duplicate "Why Choose Us" emoji section from Home page
+- 2026-02-06: Firestore now handles ONLY user-specific data: cart, wishlist, contact messages, auth
+- 2026-02-06: Cart and Wishlist pages enrich Firestore records by looking up products from local data.ts
+- 2026-02-06: All product/blog pages load instantly without network dependency
 - 2026-02-06: Added Firebase Auth (Google sign-in + email/password) with AuthContext
-- 2026-02-06: Built 10 pages: Home, Shop, Blog, Cart, Contact, Login, Signup, ProductDetail, Profile, Wishlist
-- 2026-02-06: User-bound cart and wishlist stored in Firestore subcollections
-- 2026-02-06: All 23 images converted from PNG to WebP (94% size reduction)
-- 2026-02-06: Enhanced product schema with care instructions, light/water requirements, pet-friendly flags
-- 2026-02-06: Real-time cart count in header via Firestore onSnapshot listener
-- 2026-02-06: Firestore data seeding (10 products, 4 blog posts) runs once on first load
+- 2026-02-06: Built 11 pages: Home, Shop, Blog, Cart, Contact, Login, Signup, ProductDetail, Profile, Wishlist, About
+- 2026-02-06: All 23+ images (WebP products + JPEG nursery photos)
 
 ## Tech Stack
 - Frontend: React + Vite + TailwindCSS + wouter routing
 - Backend: Express (serves frontend only, no API routes)
-- Database: Firebase Firestore (client-side SDK)
+- Data: Local data.ts for products/blogs, Firebase Firestore for user data (cart/wishlist/auth)
 - Auth: Firebase Authentication (Google + email/password)
 - Fonts: Josefin Sans (headings), Poppins (body), Playfair Display (serif accents)
 
 ## Project Architecture
-- `client/src/pages/` - Page components (Home, Shop, Blog, Cart, Contact, Login, Signup, ProductDetail, Profile, Wishlist)
-- `client/src/components/` - Shared components (Header, Footer, PageHero, ProductCard, OptimizedImage)
+- `client/src/pages/` - Page components (Home, Shop, Blog, Cart, Contact, Login, Signup, ProductDetail, Profile, Wishlist, About)
+- `client/src/components/` - Shared components (Header, Footer, PageHero, ProductCard)
 - `client/src/contexts/AuthContext.tsx` - Firebase auth context with Google/email sign-in
 - `client/src/lib/firebase.ts` - Firebase app initialization
-- `client/src/lib/firestore.ts` - Firestore service layer (products, blog, cart, wishlist, contact, seeding)
+- `client/src/lib/data.ts` - Local product/blog data with stable IDs and helper functions
+- `client/src/lib/firestore.ts` - Firestore service layer (cart, wishlist, contact only - NO products/blogs)
 - `server/` - Express server (only serves Vite frontend, no API routes)
-- `client/public/images/` - WebP-optimized plant and hero images
+- `client/public/images/` - WebP product images + JPEG nursery photos
 
-## Firestore Collections
-- `products` - Plant products with name, price, image, category, rating, description, care details
-- `blogPosts` - Blog articles with title, excerpt, image, content, author, date
+## Data Architecture
+- Products (10 items) and Blog Posts (4 items) live in `client/src/lib/data.ts` with stable string IDs
+- Product IDs: areca-palm, snake-plant, money-plant, jade-plant, peace-lily, tulsi, aloe-vera, rubber-plant, spider-plant, zz-plant
+- Cart items in Firestore store `productId` which resolves against local data via `getProductById()`
+- Wishlist items similarly reference `productId` from local data
+
+## Firestore Collections (user-specific only)
 - `users/{uid}` - User profiles
 - `users/{uid}/cart` - Cart items (productId, quantity)
 - `users/{uid}/wishlist` - Wishlist items (productId)

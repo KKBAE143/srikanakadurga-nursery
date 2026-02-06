@@ -12,9 +12,8 @@ import Signup from "@/pages/Signup";
 import ProductDetail from "@/pages/ProductDetail";
 import Profile from "@/pages/Profile";
 import Wishlist from "@/pages/Wishlist";
+import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
-import { useEffect, useState } from "react";
-import { seedFirestoreData } from "@/lib/firestore";
 
 function Router() {
   return (
@@ -29,18 +28,13 @@ function Router() {
       <Route path="/product/:id" component={ProductDetail} />
       <Route path="/profile" component={Profile} />
       <Route path="/wishlist" component={Wishlist} />
+      <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
-  const [seeded, setSeeded] = useState(false);
-
-  useEffect(() => {
-    seedFirestoreData().then(() => setSeeded(true)).catch(() => setSeeded(true));
-  }, []);
-
   return (
     <AuthProvider>
       <TooltipProvider>

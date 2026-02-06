@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { getProducts, type Product } from "@/lib/firestore";
+import { products, getCategories, type Product } from "@/lib/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
@@ -13,13 +13,7 @@ export default function Shop() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    getProducts().then((p) => { setProducts(p); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
@@ -35,7 +29,7 @@ export default function Shop() {
     setCurrentPage(1);
   };
 
-  let filteredProducts = products;
+  let filteredProducts: Product[] = [...products];
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
@@ -64,7 +58,7 @@ export default function Shop() {
     currentPage * PRODUCTS_PER_PAGE
   );
 
-  const categories = Array.from(new Set(products.map((p) => p.category)));
+  const categories = getCategories();
 
   return (
     <div className="min-h-screen bg-[#EAEFE9]">
@@ -136,19 +130,7 @@ export default function Shop() {
               </p>
             )}
 
-            {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-sm animate-pulse">
-                    <div className="aspect-square bg-gray-200" />
-                    <div className="p-3 space-y-2">
-                      <div className="h-3 bg-gray-200 rounded w-2/3" />
-                      <div className="h-3 bg-gray-200 rounded w-1/3" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : paginatedProducts.length === 0 ? (
+            {paginatedProducts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-[#8F9E8B] font-heading text-lg">No plants found</p>
                 <p className="text-sm text-[#4A4A4A] mt-1">Try adjusting your filters or search</p>

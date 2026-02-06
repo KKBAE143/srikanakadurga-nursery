@@ -3,15 +3,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLocation, Link } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PageHero from "@/components/PageHero";
 import ProductCard from "@/components/ProductCard";
-import { getWishlist, type Product, type WishlistItem } from "@/lib/firestore";
+import { getWishlistItems } from "@/lib/firestore";
+import { getProductById, type Product } from "@/lib/data";
 import { Heart } from "lucide-react";
 
 export default function Wishlist() {
   const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
-  const [items, setItems] = useState<(WishlistItem & { product?: Product })[]>([]);
+  const [wishProducts, setWishProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,8 +22,13 @@ export default function Wishlist() {
     }
     const load = async () => {
       setLoading(true);
-      const wishItems = await getWishlist(user.uid);
-      setItems(wishItems);
+      const wishItems = await getWishlistItems(user.uid);
+      const prods: Product[] = [];
+      for (const item of wishItems) {
+        const p = getProductById(item.productId);
+        if (p) prods.push(p);
+      }
+      setWishProducts(prods);
       setLoading(false);
     };
     load();
@@ -52,7 +57,7 @@ export default function Wishlist() {
               </div>
             ))}
           </div>
-        ) : items.length === 0 ? (
+        ) : wishProducts.length === 0 ? (
           <div className="text-center py-20">
             <Heart className="w-12 h-12 text-[#dde3dc] mx-auto mb-4" />
             <p className="font-heading text-xl text-[#8F9E8B] mb-3">Your wishlist is empty</p>
@@ -65,11 +70,9 @@ export default function Wishlist() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {items.map((item) =>
-              item.product ? (
-                <ProductCard key={item.id} product={item.product} />
-              ) : null
-            )}
+            {wishProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         )}
       </div>
